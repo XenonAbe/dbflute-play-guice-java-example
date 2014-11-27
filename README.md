@@ -21,7 +21,7 @@ TODO:
 
 * DBFlute関係をサブプロジェクトとして本体と分離しています (modules/dbflute)
 
-## 参考
+## ウォークスルー
 
 Global.java でGuice、DBFlute、Springの初期設定をしています。  
 以下参考リンク
