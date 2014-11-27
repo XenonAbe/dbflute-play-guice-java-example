@@ -1,0 +1,9 @@
+langs: [ "ja", "en" ],
+topKey: {
+	memberStatus:[
+		{ cdef: "MemberStatus" }
+	]
+	, fooBarStatus: {
+		"code": "FOO", "lang": { "ja": "ふー", "en": "Foo" }
+	}
+}

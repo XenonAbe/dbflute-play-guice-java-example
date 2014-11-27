@@ -1,0 +1,21 @@
+JSON_MEMBER: {
+	$comment : "member table"
+	$type : "table"
+	, MEMBER_ID : { type: "numeric", comment: "identity" }
+	, MEMBER_NAME : { type: "varchar" }
+	, MEMBER_STATUS_CODE : { type: "varchar" }
+	, JSON_MEMBER_STATUS : { type: "ref" }
+},
+JSON_PURCHASE: {
+	$comment : "purchase table"
+	$type : "table"
+	, PURCHASE_ID : { type: "numeric" }
+	, MEMBER_ID : { type: "numeric" }
+	, JSON_MEMBER : { type: "ref" }
+},
+JSON_MEMBER_STATUS: {
+	$comment : "member table"
+	$type : "table"
+	, MEMBER_STATUS_CODE : { type: "varchar", comment: "code" }
+	, MEMBER_STATUS_NAME : { type: "varchar" }
+}
