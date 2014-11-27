@@ -23,7 +23,7 @@ TODO:
 
 ## 参考
 
-Global.java でGuice、DBFlute、Springの初期設定をしています。
+Global.java でGuice、DBFlute、Springの初期設定をしています。  
 以下参考リンク
 * DBFlute - Guice連携に関して -- [Google Guiceの取扱い](http://dbflute.seasar.org/ja/manual/reference/diway/guice/)
 * PlayFramework使用時のDBFluteのAccessContext設定 - [複数スレッドに渡るTransactionへの対応](https://github.com/seasarorg/dbflute-play/issues/6#issuecomment-42439800) ()
