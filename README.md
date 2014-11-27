@@ -19,8 +19,17 @@ TODO:
 
 ## その他
 
-* DBFlute関係をサブプロジェクトとして本体と分離しています
+* DBFlute関係をサブプロジェクトとして本体と分離しています (modules/dbflute)
+
+## 参考
+
+Global.java でGuice、DBFlute、Springの初期設定をしています。
+以下参考リンク
+* DBFlute - Guice連携に関して -- [Google Guiceの取扱い](http://dbflute.seasar.org/ja/manual/reference/diway/guice/)
+* PlayFramework使用時のDBFluteのAccessContext設定 - [複数スレッドに渡るTransactionへの対応](https://github.com/seasarorg/dbflute-play/issues/6#issuecomment-42439800) ()
+* PlayFrameworkでGuiceを使用する - [JavaInjection](https://www.playframework.com/documentation/2.3.x/JavaInjection)
+* Springのトランザクション管理 - [(その14)トランザクション管理 - あるまに](http://d.hatena.ne.jp/arumani/20070327/1175006088)
+* PlayFrameworkでモジュールを別プロジェクトにする -- [Working with sub-projects](https://www.playframework.com/documentation/2.3.x/SBTSubProjects)
 
 ## 謝辞
-サンプルDBおよびそのDBからのDBFlute生成ソースは、dbflute-guice-example (https://github.com/seasarorg/dbflute-example-container/tree/master/dbflute-guice-example) の
-DB及びソースを使用させていただきました。
+サンプルDBおよびそのDBからのDBFlute生成ソースは、[dbflute-guice-example](https://github.com/seasarorg/dbflute-example-container/tree/master/dbflute-guice-example) のDB及びソースを使用させていただきました。
