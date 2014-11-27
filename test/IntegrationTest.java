@@ -1,13 +1,10 @@
-import org.junit.*;
-
-import play.mvc.*;
-import play.test.*;
-import play.libs.F.*;
-
-import static play.test.Helpers.*;
 import static org.fest.assertions.Assertions.*;
+import static play.test.Helpers.*;
 
-import static org.fluentlenium.core.filter.FilterConstructor.*;
+import org.junit.Test;
+
+import play.libs.F.Callback;
+import play.test.TestBrowser;
 
 public class IntegrationTest {
 
