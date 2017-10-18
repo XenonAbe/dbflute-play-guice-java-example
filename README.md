@@ -21,7 +21,7 @@ And open http://localhost:9000/
 
 ## その他
 
-* DBFlute関係をサブプロジェクトとして本体と分離しています (modules/dbflute)
+* DBFlute関係をサブプロジェクトとして本体と分離しています (dbfluteディレクトリ)
 
 ## ウォークスルー
 

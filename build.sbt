@@ -25,7 +25,7 @@ lazy val root = Project("Example-Main", file("."))
     )
   )
 
-lazy val dbflute = Project("Example-DBFlute", file("modules/dbflute"))
+lazy val dbflute = Project("Example-DBFlute", file("dbflute"))
 //  .disablePlugins(PlayEnhancer)
   .settings(
     commonSettings,
