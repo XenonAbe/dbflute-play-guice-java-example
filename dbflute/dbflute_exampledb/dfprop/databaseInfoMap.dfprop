@@ -15,11 +15,11 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    ; driver   = {Please write your setting! at './dfprop/databaseInfoMap.dfprop'}
-    ; url      = ...
-    ; schema   = ...
-    ; user     = ...
-    ; password = ...
+    ; driver   = org.h2.Driver
+    ; url      = jdbc:h2:../../dist/db/exampledb
+    ; schema   = 
+    ; user     = sa
+    ; password = 
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o propertiesMap: (NotRequired - Default map:{})

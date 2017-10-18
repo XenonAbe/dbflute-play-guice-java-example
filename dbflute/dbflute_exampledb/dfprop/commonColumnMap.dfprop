@@ -29,20 +29,20 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    #; commonColumnMap = map:{
-    #    ; REGISTER_DATETIME=TIMESTAMP ; REGISTER_USER=VARCHAR
-    #    ; UPDATE_DATETIME=TIMESTAMP   ; UPDATE_USER=VARCHAR
-    #}
-    #; beforeInsertMap = map:{
-    #    ; REGISTER_DATETIME = $$AccessContext$$.getAccessTimestampOnThread()
-    #    ; REGISTER_USER     = $$AccessContext$$.getAccessUserOnThread()
-    #    ; UPDATE_DATETIME   = entity.getRegisterDatetime()
-    #    ; UPDATE_USER       = entity.getRegisterUser()
-    #}
-    #; beforeUpdateMap = map:{
-    #    ; UPDATE_DATETIME   = $$AccessContext$$.getAccessTimestampOnThread()
-    #    ; UPDATE_USER       = $$AccessContext$$.getAccessUserOnThread()
-    #}
+    ; commonColumnMap = map:{
+        ; REGISTER_DATETIME=TIMESTAMP ; REGISTER_USER=VARCHAR
+        ; UPDATE_DATETIME=TIMESTAMP   ; UPDATE_USER=VARCHAR
+    }
+    ; beforeInsertMap = map:{
+        ; REGISTER_DATETIME = $$AccessContext$$.getAccessTimestampOnThread()
+        ; REGISTER_USER     = $$AccessContext$$.getAccessUserOnThread()
+        ; UPDATE_DATETIME   = entity.getRegisterDatetime()
+        ; UPDATE_USER       = entity.getRegisterUser()
+    }
+    ; beforeUpdateMap = map:{
+        ; UPDATE_DATETIME   = $$AccessContext$$.getAccessTimestampOnThread()
+        ; UPDATE_USER       = $$AccessContext$$.getAccessUserOnThread()
+    }
 }
 # ----------------/
 #
