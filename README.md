@@ -9,11 +9,12 @@ Play Framework 2.3.x 上で DBFluteを使用するサンプルです。
 * Dependency InjectionライブラリにGoogle Guiceを使用
 
 ## How to run
+Run this using sbt. (see [Installing sbt](http://www.scala-sbt.org/1.x/docs/Setup.html))
 
 Start the Play app:
 
 ```
-activator run
+sbt run
 ```
 
 And open http://localhost:9000/
