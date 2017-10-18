@@ -1,21 +1,22 @@
 # DBFlute Play Framework 2 Example
+Play Framework 2.3.x 上で DBFluteを使用するサンプルです。
 
-Play Framework 2 上で DBFluteを使用するサンプルです。
+## Overview
 
-## 特徴
-
-* Spring FrameworkのTransaction Managementを使用。メソッドに@Transactionalアノテーションを付加してトランザクション管理 (例外発生時にロールバック)
+* O/Rマッパーに[DBFlute](http://dbflute.seasar.org/ja/introduction/index.html)を使用
+* [Spring Framework](https://projects.spring.io/spring-framework/)の[Transaction Management](https://docs.spring.io/spring/docs/4.0.3.RELEASE/spring-framework-reference/html/transaction.html)を使用。例えば、メソッドに@Transactionalアノテーション([Reference](https://docs.spring.io/spring/docs/4.0.3.RELEASE/spring-framework-reference/html/transaction.html#transaction-declarative-annotations))を付加したり、TransactionTemplate([Reference](https://docs.spring.io/spring/docs/4.0.3.RELEASE/spring-framework-reference/html/transaction.html#tx-prog-template))を使用したトランザクション制御を行うことができる。混在も可能。基本的な通常実行時にはCommit、例外発生時にRollbackする動作の他、柔軟なトランザクション制御([e.g.Transaction propagation](https://docs.spring.io/spring/docs/4.0.3.RELEASE/spring-framework-reference/htmlsingle/#tx-propagation))が可能
 * コネクションプールにはPlay組み込みのBoneCPを使用
 * Dependency InjectionライブラリにGoogle Guiceを使用
-* O/RマッパーにDBFluteを使用
-* 設定ファイルに追加設定不要(PlayFrameworkとして必要な記述のみ)
 
-## 動作方法
+## How to run
 
-activator.bat を実行し、run コマンドで起動
+Start the Play app:
 
-TODO: 
-  現在、http://localhost:9000/test_insert でDBに1件登録するのみ。2回目以降はキー違反で例外発生。
+```
+activator run
+```
+
+And open http://localhost:9000/
 
 ## その他
 
@@ -26,10 +27,9 @@ TODO:
 Global.java でGuice、DBFlute、Springの初期設定をしています。  
 以下参考リンク
 * DBFlute - Guice連携に関して -- [Google Guiceの取扱い](http://dbflute.seasar.org/ja/manual/reference/diway/guice/)
-* PlayFramework使用時のDBFluteのAccessContext設定 - [複数スレッドに渡るTransactionへの対応](https://github.com/seasarorg/dbflute-play/issues/6#issuecomment-42439800) ()
-* PlayFrameworkでGuiceを使用する - [JavaInjection](https://www.playframework.com/documentation/2.3.x/JavaInjection)
+* PlayFramework使用時のDBFluteのAccessContext設定 - [複数スレッドに渡るTransactionへの対応](https://github.com/seasarorg/dbflute-play/issues/6#issuecomment-42439800)
 * Springのトランザクション管理 - [(その14)トランザクション管理 - あるまに](http://d.hatena.ne.jp/arumani/20070327/1175006088)
-* PlayFrameworkでモジュールを別プロジェクトにする -- [Working with sub-projects](https://www.playframework.com/documentation/2.3.x/SBTSubProjects)
+* PlayFrameworkでGuiceを使用する - [JavaInjection](https://www.playframework.com/documentation/2.3.x/JavaInjection)
 
 ## 謝辞
 サンプルDBおよびそのDBからのDBFlute生成ソースは、[dbflute-guice-example](https://github.com/seasarorg/dbflute-example-container/tree/master/dbflute-guice-example) のDB及びソースを使用させていただきました。
