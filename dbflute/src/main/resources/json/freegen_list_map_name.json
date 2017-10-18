@@ -1,6 +1,0 @@
-langs: [ "ja", "en" ],
-simpleKey: [
-	{ "code": "FIRST_CODE", "lang": { "ja": "ふー", "en": "Foo" } }
-	, { "code": "SecondCode", "lang": { "ja": "ばー", "en": "Bar" } }
-	, { "code": "third_CODE", "lang": { "ja": "くっくす", "en": "Qux" } }
-]

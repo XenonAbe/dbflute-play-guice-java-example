@@ -1,4 +1,0 @@
-langs: [ "ja", "en" ],
-clarinetKey: {
-	FOO:ABC, BAR:DEF, QUX:GHI
-}
