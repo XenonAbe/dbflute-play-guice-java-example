@@ -1,37 +1,44 @@
 name := """dbflute-play-guice-java-example"""
 
-version := "1.0-SNAPSHOT"
-
-lazy val root = (project in file(".")).enablePlugins(PlayJava)
-    .aggregate(dbflute)
-    .dependsOn(dbflute)
-
-lazy val dbflute = (project in file("modules/dbflute"))
-
-scalaVersion := "2.11.1"
-
-libraryDependencies ++= Seq(
-  javaJdbc,
-  //javaEbean,
-  cache,
-  javaWs,
-  Common.libDbfluteRuntime,
-  Common.libGuice,
-  "org.springframework" % "spring-jdbc" % "3.2.4.RELEASE",
-  "org.springframework" % "spring-aop" % "3.2.4.RELEASE",
-  "com.h2database" % "h2" % "1.4.178"
+def commonSettings = Seq(
+  version := "2.3.1-SNAPSHOT",
+  scalaVersion := "2.11.6",     // cf. templates/build.sbt in Play Framework Source
+  javacOptions ++= Seq("-encoding", "utf8"),
+  resolvers += Dependencies.additionalResolvers
 )
 
-resolvers += Common.additionalResolvers
+lazy val root = Project("Example-Main", file("."))
+  .enablePlugins(PlayJava)
+  .dependsOn(dbflute)
+  .aggregate(dbflute)
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      javaJdbc,
+      //javaEbean,
+      cache,
+      javaWs,
+      Dependencies.guice,
+      "org.springframework" % "spring-jdbc" % Dependencies.springframeworkVersion,
+      "org.springframework" % "spring-aop" % Dependencies.springframeworkVersion,
+      "com.h2database" % "h2" % Dependencies.h2databaseVersion
+    )
+  )
+
+lazy val dbflute = Project("Example-DBFlute", file("modules/dbflute"))
+//  .disablePlugins(PlayEnhancer)
+  .settings(
+    commonSettings,
+    autoScalaLibrary := false,
+    crossPaths := false,
+    libraryDependencies ++= Seq(
+      Dependencies.guice,
+      Dependencies.dbfluteRuntime,
+      "joda-time" % "joda-time" % "2.3",
+      "net.arnx" % "jsonic" % "1.2.11",
+      "net.vvakame" % "jsonpullparser-core" % "1.4.11",
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.1.3"
+    )
+  )
 
 PlayKeys.ebeanEnabled := false
-
-// eclipse settings
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE17)
-
-EclipseKeys.withSource := true
-
-EclipseKeys.eclipseOutput := Some(".target")
-
-EclipseKeys.skipParents in ThisBuild := false
