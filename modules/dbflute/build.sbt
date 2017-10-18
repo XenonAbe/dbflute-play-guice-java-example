@@ -6,7 +6,7 @@ autoScalaLibrary := false
 
 crossPaths := false
 
-javacOptions ++= Seq("-source", "1.7", "-target", "1.7", "-encoding", "utf8")
+javacOptions ++= Seq("-encoding", "utf8")
 
 libraryDependencies ++= Seq(
   Common.libDbfluteRuntime,
