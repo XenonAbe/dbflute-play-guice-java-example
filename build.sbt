@@ -18,10 +18,10 @@ lazy val root = Project("Example-Main", file("."))
       //javaEbean,
       cache,
       javaWs,
+      filters,
       Dependencies.guice,
       "org.springframework" % "spring-jdbc" % Dependencies.springframeworkVersion,
-      "org.springframework" % "spring-aop" % Dependencies.springframeworkVersion,
-      "com.h2database" % "h2" % Dependencies.h2databaseVersion
+      "org.springframework" % "spring-aop" % Dependencies.springframeworkVersion
     )
   )
 
@@ -33,11 +33,7 @@ lazy val dbflute = Project("Example-DBFlute", file("dbflute"))
     crossPaths := false,
     libraryDependencies ++= Seq(
       Dependencies.guice,
-      Dependencies.dbfluteRuntime,
-      "joda-time" % "joda-time" % "2.3",
-      "net.arnx" % "jsonic" % "1.2.11",
-      "net.vvakame" % "jsonpullparser-core" % "1.4.11",
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.1.3"
+      Dependencies.dbfluteRuntime
     )
   )
 
