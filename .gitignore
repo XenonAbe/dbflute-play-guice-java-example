@@ -1,12 +1,22 @@
-logs
-project/project
-project/target
-target
-.target
-tmp
+# Ignore Play! working directory #
+bin/
+/db
+.eclipse
+/lib/
+/logs/
+/modules
+/project/project
+/project/target
+tmp/
+test-result
+server.pid
+*.eml
+# /dist/
+.cache
+target/
+.target/
 .history
 .cache
-dist
 /.idea
 /*.iml
 /out
@@ -15,3 +25,6 @@ dist
 /.project
 /RUNNING_PID
 /.settings
+
+*.trace.db
+*.lock.db
