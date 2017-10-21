@@ -37,8 +37,6 @@ lazy val dbflute = Project("Example-DBFlute", file("dbflute"))
     )
   )
 
-PlayKeys.ebeanEnabled := false
-
 javaOptions in Test ++= Seq(
   "-Dconfig.resource=application-test.conf",
   "-Dlogger.resource=application-logger-test.xml"
