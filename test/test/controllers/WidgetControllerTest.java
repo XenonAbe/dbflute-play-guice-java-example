@@ -2,8 +2,8 @@ package test.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
+import play.mvc.Http;
 import play.mvc.Result;
-import play.test.FakeRequest;
 import play.test.Helpers;
 import play.test.WithApplication;
 
@@ -20,27 +20,33 @@ public class WidgetControllerTest extends WithApplication {
 
     @Test
     public void testIndex() {
-        final FakeRequest request = Helpers.fakeRequest(GET, "/");
+        final Http.RequestBuilder request = Helpers.fakeRequest()
+                .method(GET)
+                .uri("/");
 
         Result result = route(request);
-        assertEquals(OK, Helpers.status(result));
+        assertEquals(OK, result.status());
     }
 
     @Test
     public void testListWidget() {
-        final FakeRequest request = Helpers.fakeRequest(GET, "/widgets");
+        final Http.RequestBuilder request = Helpers.fakeRequest()
+                .method(GET)
+                .uri("/widgets");
 
         Result result = route(request);
-        assertEquals(OK, Helpers.status(result));
+        assertEquals(OK, result.status());
     }
 
     @Test
     public void testCreateWidget() {
-        final FakeRequest request = Helpers.fakeRequest(POST, "/widgets")
-                .withFormUrlEncodedBody(ImmutableMap.of("name","widget 6", "price", "6"));
+        final Http.RequestBuilder request = Helpers.fakeRequest()
+                .method(POST)
+                .uri("/widgets")
+                .bodyForm(ImmutableMap.of("name","widget 6", "price", "6"));
 
         Result result = route(request);
-        assertEquals(FORBIDDEN, Helpers.status(result));    // Reject by CSRF Filter
+        assertEquals(FORBIDDEN, result.status());    // Reject by CSRF Filter
     }
 
 }

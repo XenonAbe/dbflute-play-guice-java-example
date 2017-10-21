@@ -40,5 +40,5 @@ routesGenerator := InjectedRoutesGenerator
 
 javaOptions in Test ++= Seq(
   "-Dconfig.resource=application-test.conf",
-  "-Dlogger.resource=application-logger-test.xml"
+  "-Dlogger.resource=logback-test.xml"
 )

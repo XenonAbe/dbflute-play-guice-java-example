@@ -5,11 +5,9 @@ import dbflute.exbhv.WidgetBhv;
 import dbflute.exentity.Widget;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import play.Logger;
 
@@ -86,14 +84,11 @@ public class TransactionTestService {
      * TransactionTemplateによるトランザクション制御
      * 例外を発生させてRollbackする
      */
-    public void insertRequiredAndAbortByTemplate(final List<String> values) {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                insertInternal(values);
+    public void insertRequiredAndAbortByTemplate(List<String> values) {
+        transactionTemplate.execute(status -> {
+            insertInternal(values);
 
-                throw new RuntimeException("Abort");
-            }
+            throw new RuntimeException("Abort");
         });
     }
 
@@ -170,26 +165,20 @@ public class TransactionTestService {
      * TransactionTemplateによるトランザクション制御
      * Propagation混在
      */
-    public void insertTripleByTemplate(final List<String> values, final List<String> values2, final List<String> values3) {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                insertInternal(values);
+    public void insertTripleByTemplate(List<String> values, List<String> values2, List<String> values3) {
+        transactionTemplate.execute(status -> {
+            insertInternal(values);
 
-                transactionTemplateRequiresNew.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        insertInternal(values2);
-                    }
-                });
+            transactionTemplateRequiresNew.execute(status2 -> {
+                insertInternal(values2);
+                return null;
+            });
 
-                transactionTemplateNested.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        insertInternal(values3);
-                    }
-                });
-            }
+            transactionTemplateNested.execute(status2 -> {
+                insertInternal(values3);
+                return null;
+            });
+            return null;
         });
     }
 
@@ -198,27 +187,20 @@ public class TransactionTestService {
      * Propagation混在
      * 例外を発生させてRollbackする
      */
-    public void insertTripleAndAbortByTemplate(final List<String> values, final List<String> values2, final List<String> values3) {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                insertInternal(values);
+    public void insertTripleAndAbortByTemplate(List<String> values, List<String> values2, List<String> values3) {
+        transactionTemplate.execute(status -> {
+            insertInternal(values);
 
-                transactionTemplateNested.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        insertInternal(values2);
-                    }
-                });
+            transactionTemplateNested.execute(status2 -> {
+                insertInternal(values2);
+                return null;
+            });
 
-                transactionTemplateRequiresNew.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        insertInternal(values3);
-                        throw new RuntimeException("Abort");
-                    }
-                });
-            }
+            transactionTemplateRequiresNew.execute(status2 -> {
+                insertInternal(values3);
+                throw new RuntimeException("Abort");
+            });
+            return null;
         });
     }
 
@@ -353,14 +335,12 @@ public class TransactionTestService {
      * 例外を発生させてRollbackするが別トランザクションはCommitしている
      */
     @Transactional
-    public void insertTripleWithRequiresNewAndAbortByTemplate(List<String> values, final List<String> values2, List<String> values3) {
+    public void insertTripleWithRequiresNewAndAbortByTemplate(List<String> values, List<String> values2, List<String> values3) {
         insertInternal(values);
 
-        transactionTemplateRequiresNew.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                insertInternal(values2);
-            }
+        transactionTemplateRequiresNew.execute(status -> {
+            insertInternal(values2);
+            return null;
         });
 
         insertRequired(values3);
@@ -388,14 +368,12 @@ public class TransactionTestService {
      * ネストしたトランザクションともにRollback
      */
     @Transactional
-    public void insertTripleWithNestedAndAbortByTemplate(List<String> values, final List<String> values2, List<String> values3) {
+    public void insertTripleWithNestedAndAbortByTemplate(List<String> values, List<String> values2, List<String> values3) {
         insertInternal(values);
 
-        transactionTemplateNested.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                insertInternal(values2);
-            }
+        transactionTemplateNested.execute(status -> {
+            insertInternal(values2);
+            return null;
         });
 
         insertInternal(values3);
@@ -425,17 +403,14 @@ public class TransactionTestService {
      * ネストしたトランザクションのみRollback
      */
     @Transactional
-    public void insertTripleWithNestedAndAbortNestedOnlyByTemplate(List<String> values, final List<String> values2, List<String> values3) {
+    public void insertTripleWithNestedAndAbortNestedOnlyByTemplate(List<String> values, List<String> values2, List<String> values3) {
         insertInternal(values);
 
         try {
-            transactionTemplateNested.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    insertInternal(values2);
+            transactionTemplateNested.execute(status -> {
+                insertInternal(values2);
 
-                    throw new RuntimeException("Abort");
-                }
+                throw new RuntimeException("Abort");
             });
         } catch (Exception e) {
             logger.warn(e.getMessage());
@@ -470,7 +445,7 @@ public class TransactionTestService {
 
         List<Widget> list = widgetBhv.selectList(cb);
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (Widget entity : list) {
             result.add(entity.getName());
         }

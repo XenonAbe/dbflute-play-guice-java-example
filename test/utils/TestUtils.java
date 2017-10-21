@@ -5,8 +5,7 @@ import play.api.GlobalSettings;
 public class TestUtils {
 
     public static <T> T instanceOf(play.test.FakeApplication app, Class<T> type) {
-        final GlobalSettings globalSettings = app.getWrappedApplication().global();
-        return globalSettings.getControllerInstance(type);
+        return app.injector().instanceOf(type);
     }
 
     public static String getMethodName() {

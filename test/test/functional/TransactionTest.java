@@ -149,7 +149,7 @@ public class TransactionTest {
 
         List<String> result = selectResultValues();
 
-        assertThat(testName, result, equalTo((List<String>)new ImmutableList.Builder<String>().addAll(values).addAll(values2).addAll(values3).build()));
+        assertThat(testName, result, equalTo(new ImmutableList.Builder<String>().addAll(values).addAll(values2).addAll(values3).build()));
 
         logger.info("----------------------------------------------------{}-", testName);
     }
@@ -171,7 +171,7 @@ public class TransactionTest {
 
         List<String> result = selectResultValues();
 
-        assertThat(testName, result, equalTo((List<String>)new ImmutableList.Builder<String>().addAll(values).addAll(values2).addAll(values3).build()));
+        assertThat(testName, result, equalTo(new ImmutableList.Builder<String>().addAll(values).addAll(values2).addAll(values3).build()));
 
         logger.info("----------------------------------------------------{}-", testName);
     }
@@ -263,9 +263,7 @@ public class TransactionTest {
         List<String> values2 = Lists.newArrayList(TransactionTestService.ValuePrefix + "X02");
         try {
             transactionTestService.insertAndNoRollbackNoEffectAbort(values, values2);
-        } catch (Error e) {
-            logger.warn(e.getMessage());
-        } catch (RuntimeException e) {
+        } catch (Error | RuntimeException e) {
             logger.warn(e.getMessage());
         }
 
@@ -283,7 +281,7 @@ public class TransactionTest {
 
         result = selectResultValues();
 
-        assertThat(testName + "2", result, equalTo((List<String>)new ImmutableList.Builder<String>().addAll(values).addAll(values2).build()));
+        assertThat(testName + "2", result, equalTo(new ImmutableList.Builder<String>().addAll(values).addAll(values2).build()));
 
         logger.info("----------------------------------------------------{}-", testName);
     }
@@ -380,7 +378,7 @@ public class TransactionTest {
 
         List<String> result = selectResultValues();
 
-        assertThat(testName, result, equalTo((List<String>)new ImmutableList.Builder<String>().addAll(values).addAll(values3).build()));
+        assertThat(testName, result, equalTo(new ImmutableList.Builder<String>().addAll(values).addAll(values3).build()));
 
         logger.info("----------------------------------------------------{}-", testName);
     }
@@ -437,7 +435,7 @@ public class TransactionTest {
 
         result = selectResultValues();
 
-        assertThat(testName + "2", result, equalTo((List<String>)new ImmutableList.Builder<String>().addAll(values).addAll(values3).build()));
+        assertThat(testName + "2", result, equalTo(new ImmutableList.Builder<String>().addAll(values).addAll(values3).build()));
 
         logger.info("----------------------------------------------------{}-", testName);
     }
@@ -472,7 +470,7 @@ public class TransactionTest {
 
         result = selectResultValues();
 
-        assertThat(testName + "2", result, equalTo((List<String>)new ImmutableList.Builder<String>().addAll(values).addAll(values3).build()));
+        assertThat(testName + "2", result, equalTo(new ImmutableList.Builder<String>().addAll(values).addAll(values3).build()));
 
         logger.info("----------------------------------------------------{}-", testName);
     }
