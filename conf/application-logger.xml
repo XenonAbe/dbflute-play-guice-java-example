@@ -19,8 +19,10 @@
   <logger name="play" level="INFO" />
   <logger name="application" level="DEBUG" />
 
-  <logger name="com.jolbox.bonecp" level="TRACE" />
-  <logger name="org.springframework.jdbc.datasource" level="DEBUG" />
+  <logger name="app" level="DEBUG" />
+
+  <!-- <logger name="com.jolbox.bonecp" level="TRACE" /> -->
+  <logger name="org.springframework.jdbc.datasource" level="INFO" />
   <logger name="org.seasar.dbflute" level="INFO" />
   <logger name="org.seasar.dbflute.QLog" level="DEBUG" />
 
