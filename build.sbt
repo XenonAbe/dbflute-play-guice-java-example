@@ -1,7 +1,7 @@
 name := """dbflute-play-guice-java-example"""
 
 def commonSettings = Seq(
-  version := "2.3.1-SNAPSHOT",
+  version := "2.3.1",
   scalaVersion := "2.11.6",     // cf. templates/build.sbt in Play Framework Source
   javacOptions ++= Seq("-encoding", "utf8"),
   resolvers += Dependencies.additionalResolvers
