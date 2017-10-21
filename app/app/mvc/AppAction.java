@@ -40,17 +40,7 @@ public class AppAction extends Action.Simple {
             logger.info("BEGIN ctx:{} {} {}", ctx.id(), ctx.request().method(), ctx.request().uri());
 
         // DBFlute AccessContextの設定
-        AccessContext accessContext = new AccessContext();
-        accessContext.setAccessUserProvider(new AccessContext.AccessUserProvider() {
-            @Override
-            public String getAccessUser() {
-                final Http.Context ctx = Http.Context.current.get();
-                final String user = ctx == null ? "" : ctx.request().username();
-                return user == null ? "unknown" : user;
-            }
-        });
-
-        AccessContext.setAccessContextOnThread(accessContext);
+        AccessContext.setAccessContextOnThread(createAccessContext());
     }
 
     protected void cleanupContext(Http.Context ctx) {
@@ -60,6 +50,19 @@ public class AppAction extends Action.Simple {
 
         if (logger.isInfoEnabled())
             logger.info("END   ctx:{}", ctx.id());
+    }
+
+    protected AccessContext createAccessContext() {
+        AccessContext accessContext = new AccessContext();
+        accessContext.setAccessUserProvider(() -> {
+            return getAccessUser(Http.Context.current.get());
+        });
+        return accessContext;
+    }
+
+    protected String getAccessUser(Http.Context ctx) {
+        final String user = ctx == null ? "" : ctx.request().username();    // ユーザー認証されていない場合はnullとなる
+        return user == null ? "unknown" : user;
     }
 
 }
