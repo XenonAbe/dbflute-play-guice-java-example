@@ -15,7 +15,6 @@ lazy val root = Project("Example-Main", file("."))
     commonSettings,
     libraryDependencies ++= Seq(
       javaJdbc,
-      //javaEbean,
       cache,
       javaWs,
       filters,
@@ -36,6 +35,8 @@ lazy val dbflute = Project("Example-DBFlute", file("dbflute"))
       Dependencies.dbfluteRuntime
     )
   )
+
+routesGenerator := InjectedRoutesGenerator
 
 javaOptions in Test ++= Seq(
   "-Dconfig.resource=application-test.conf",
