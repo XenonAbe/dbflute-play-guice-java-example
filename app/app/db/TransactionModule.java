@@ -8,8 +8,9 @@ import org.springframework.transaction.annotation.AnnotationTransactionAttribute
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
-import play.db.DB;
+import play.api.db.Database;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -30,9 +31,16 @@ public class TransactionModule extends AbstractModule {
     }
 
     protected static class PlatformTransactionManagerProvider implements Provider<PlatformTransactionManager> {
+        private final Database db;
+
+        @Inject
+        public PlatformTransactionManagerProvider(Database db) {
+            this.db = db;
+        }
+
         @Override
         public PlatformTransactionManager get() {
-            return new TransactionManagerWithDBFlute(DB.getDataSource());
+            return new TransactionManagerWithDBFlute(db.dataSource());
         }
     }
 

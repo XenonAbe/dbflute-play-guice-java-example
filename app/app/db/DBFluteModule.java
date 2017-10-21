@@ -2,41 +2,32 @@ package app.db;
 
 import app.core.Constants;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
 import org.seasar.dbflute.AccessContext;
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import play.Application;
-import play.Play;
-import play.db.DB;
-import play.libs.F;
+import play.api.db.Database;
 import play.mvc.Http;
 
+import javax.inject.Provider;
 import javax.sql.DataSource;
+import java.util.function.Function;
 
 public class DBFluteModule extends AbstractModule {
 
-    private final F.Function<DataSource, AbstractModule> createActualDBFluteModuleFunction;
+    private final Function<DataSource, AbstractModule> createActualDBFluteModuleFunction;
 
     public DBFluteModule() {
         this(null);
     }
 
-    public DBFluteModule(F.Function<DataSource, AbstractModule> createActualDBFluteModuleFunction) {
+    public DBFluteModule(Function<DataSource, AbstractModule> createActualDBFluteModuleFunction) {
         this.createActualDBFluteModuleFunction = createActualDBFluteModuleFunction;
     }
 
     @Override
     protected void configure() {
-        setupAccessContextHolder(new Provider<Application>() {
-            @Override
-            public Application get() {
-                return Play.application();
-            }
-        });
+        setupAccessContextHolder(getProvider(Application.class));
 
-        final DataSource dataSource = DB.getDataSource();
-
-        final TransactionAwareDataSourceProxy dataSourceProxy = new TransactionAwareDataSourceProxy(dataSource);
+        final TransactionAwareDataSourceProxy dataSourceProxy = new TransactionAwareDataSourceProxy(getProvider(Database.class));
 
         final AbstractModule dbFluteModule = createActualDBFluteModule(dataSourceProxy);
 
@@ -45,13 +36,7 @@ public class DBFluteModule extends AbstractModule {
 
     protected AbstractModule createActualDBFluteModule(DataSource dataSource) {
         if (createActualDBFluteModuleFunction != null) {
-            try {
-                return createActualDBFluteModuleFunction.apply(dataSource);
-            } catch (RuntimeException ex) {
-                throw ex;
-            } catch (Throwable throwable) {
-                throw new RuntimeException(throwable);
-            }
+            return createActualDBFluteModuleFunction.apply(dataSource);
         } else {
             // TODO load from application.conf
             throw new UnsupportedOperationException();
@@ -61,13 +46,13 @@ public class DBFluteModule extends AbstractModule {
     /**
      * DBFlute AccessContextHolder の設定
      */
-    private void setupAccessContextHolder(final Provider<Application> applicationProvider) {
+    private void setupAccessContextHolder(Provider<Application> applicationProvider) {
         AccessContext.unlock();
         AccessContext.useSurrogateHolder(createAccessContextHolder(applicationProvider));
         AccessContext.lock();
     }
 
-    protected AccessContext.AccessContextHolder createAccessContextHolder(final Provider<Application> applicationProvider) {
+    protected AccessContext.AccessContextHolder createAccessContextHolder(Provider<Application> applicationProvider) {
         return new AccessContextHolder(applicationProvider);
     }
 

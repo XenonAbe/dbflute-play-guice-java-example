@@ -44,11 +44,6 @@ public class Global extends GlobalSettings {
     }
 
     @Override
-    public <A> A getControllerInstance(Class<A> controllerClass) throws Exception {
-        return INJECTOR.getInstance(controllerClass);
-    }
-
-    @Override
     @SuppressWarnings("rawtypes")
     public Action onRequest(Request request, Method actionMethod) {
         return new AppAction(actionMethod);
