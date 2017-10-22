@@ -7,6 +7,7 @@ import org.dbflute.cbean.result.ListResultBean;
 import org.springframework.transaction.annotation.Transactional;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -19,22 +20,25 @@ import static play.libs.Scala.toSeq;
 public class WidgetController extends Controller {
     private static final Logger.ALogger logger = Logger.of(WidgetController.class);
 
+    private final FormFactory formFactory;
+
     private final WidgetBhv widgetBhv;
 
     @Inject
-    public WidgetController(WidgetBhv widgetBhv) {
+    public WidgetController(FormFactory formFactory, WidgetBhv widgetBhv) {
+        this.formFactory = formFactory;
         this.widgetBhv = widgetBhv;
     }
 
     public Result listWidgets() {
-        final Form<WidgetItem> form = Form.form(WidgetItem.class);
+        final Form<WidgetItem> form = formFactory.form(WidgetItem.class);
 
         return ok(views.html.listWidgets.render(toSeq(selectWidgetList()), form));
     }
 
     @Transactional
     public Result createWidget() {
-        final Form<WidgetItem> form = Form.form(WidgetItem.class).bindFromRequest();
+        final Form<WidgetItem> form = formFactory.form(WidgetItem.class).bindFromRequest();
 
         if (form.hasErrors()) {
             logger.error("errors = {}", form.errors());
