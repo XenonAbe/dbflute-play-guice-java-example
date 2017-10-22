@@ -2,7 +2,7 @@ name := """dbflute-play-guice-java-example"""
 
 def commonSettings = Seq(
   version := "2.5.1-SNAPSHOT",
-  scalaVersion := "2.11.6",     // cf. templates/build.sbt in Play Framework Source
+  scalaVersion := "2.11.7",     // cf. templates/build.sbt in Play Framework Source
   javacOptions ++= Seq("-encoding", "utf8")
 )
 
@@ -33,8 +33,6 @@ lazy val dbflute = Project("Example-DBFlute", file("dbflute"))
       Dependencies.dbfluteRuntime
     )
   )
-
-routesGenerator := InjectedRoutesGenerator
 
 javaOptions in Test ++= Seq(
   "-Dconfig.resource=application-test.conf",
