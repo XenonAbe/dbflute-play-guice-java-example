@@ -1,22 +1,15 @@
 package app.http;
 
-import play.api.mvc.EssentialFilter;
 import play.filters.csrf.CSRFFilter;
-import play.http.HttpFilters;
+import play.http.DefaultHttpFilters;
 
 import javax.inject.Inject;
 
-public class Filters implements HttpFilters {
-
-    private final CSRFFilter csrf;
+public class Filters extends DefaultHttpFilters {
 
     @Inject
-    public Filters(CSRFFilter csrf) {
-        this.csrf = csrf;
+    public Filters(CSRFFilter csrfFilter) {
+        super(csrfFilter);
     }
 
-    @Override
-    public EssentialFilter[] filters() {
-        return new EssentialFilter[] { csrf };
-    }
 }
