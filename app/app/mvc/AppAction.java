@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
 public class AppAction extends Action.Simple {
-    private static final Logger.ALogger logger = Logger.of("application");
+    private static final Logger.ALogger logger = Logger.of(AppAction.class);
 
     protected final Method actionMethod;
 
