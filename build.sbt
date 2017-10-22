@@ -17,7 +17,6 @@ lazy val root = Project("Example-Main", file("."))
       cache,
       javaWs,
       filters,
-      Dependencies.guice,
       "org.springframework" % "spring-jdbc" % Dependencies.springframeworkVersion,
       "org.springframework" % "spring-aop" % Dependencies.springframeworkVersion
     )
