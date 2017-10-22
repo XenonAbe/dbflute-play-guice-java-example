@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en"> <!-- main language (to avoid HTML validator) -->
 <head>
 	<meta charset="UTF-8" />
 	<title>example schema</title>
@@ -280,7 +280,7 @@ dl.procedurelist dd.column pre {
 	<ul id="suggestion-list" class="suggestionarea"></ul>
 	<span class="searchmemo">*Push 'tab' (primary tab order)</span>
 </div>
-<table summary="Tables in the Schema">
+<table>
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
@@ -306,7 +306,7 @@ dl.procedurelist dd.column pre {
 <h2 id="widget" title="type=TABLE, primaryKey={ID}, nameLength=6, columnCount=8">
 WIDGET
 </h2>
-<table summary="Columns in WIDGET">
+<table>
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
@@ -387,7 +387,7 @@ WIDGET
 		<td class="relcell">&nbsp;</td>
 		<td class="relcell"> &nbsp;</td>
 		<td class="subcell">registerDatetime</td>
-		<td class="subcell">Timestamp</td>
+		<td class="subcell">LocalDateTime</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">5</td>
@@ -419,7 +419,7 @@ WIDGET
 		<td class="relcell">&nbsp;</td>
 		<td class="relcell"> &nbsp;</td>
 		<td class="subcell">updateDatetime</td>
-		<td class="subcell">Timestamp</td>
+		<td class="subcell">LocalDateTime</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">7</td>
@@ -459,7 +459,7 @@ WIDGET
 
 <h2 id="thanks">Thanks</h2>
 <p>
-	Created by <a href="http://dbflute.seasar.org/">DBFlute(AutoGenerator)</a>
+	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
 </p>
 <script>
 /**
