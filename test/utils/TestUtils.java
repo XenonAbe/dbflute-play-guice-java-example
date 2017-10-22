@@ -1,10 +1,10 @@
 package utils;
 
-import play.api.GlobalSettings;
+import play.Application;
 
 public class TestUtils {
 
-    public static <T> T instanceOf(play.test.FakeApplication app, Class<T> type) {
+    public static <T> T instanceOf(Application app, Class<T> type) {
         return app.injector().instanceOf(type);
     }
 

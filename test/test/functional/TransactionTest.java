@@ -2,11 +2,15 @@ package test.functional;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.dbflute.system.QLog;
 import org.junit.*;
 import org.springframework.transaction.UnexpectedRollbackException;
+import play.Application;
 import play.Logger;
-import play.test.FakeApplication;
+import play.Mode;
+import play.inject.guice.GuiceApplicationBuilder;
 import play.test.Helpers;
 import utils.DBFluteTestUtils;
 import utils.TestUtils;
@@ -21,12 +25,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TransactionTest {
     private static final Logger.ALogger logger = Logger.of(TransactionTest.class);
 
-    private static FakeApplication app;
+    private static Application app;
     private static TransactionTestService transactionTestService;
 
     @BeforeClass
     public static void start() {
-        app = Helpers.fakeApplication();
+        GuiceApplicationBuilder builder = new GuiceApplicationBuilder()
+                .in(Mode.TEST);
+        final Injector injector = Guice.createInjector(builder.applicationModule());
+        app = injector.getInstance(Application.class);
+
         Helpers.start(app);
         transactionTestService = TestUtils.instanceOf(app, TransactionTestService.class);
     }
