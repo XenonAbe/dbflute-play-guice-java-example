@@ -3,8 +3,7 @@ name := """dbflute-play-guice-java-example"""
 def commonSettings = Seq(
   version := "2.4.1-SNAPSHOT",
   scalaVersion := "2.11.6",     // cf. templates/build.sbt in Play Framework Source
-  javacOptions ++= Seq("-encoding", "utf8"),
-  resolvers += Dependencies.additionalResolvers
+  javacOptions ++= Seq("-encoding", "utf8")
 )
 
 lazy val root = Project("Example-Main", file("."))

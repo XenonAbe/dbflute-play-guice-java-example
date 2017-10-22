@@ -1,10 +1,9 @@
 package controllers;
 
-import dbflute.cbean.WidgetCB;
 import dbflute.exbhv.WidgetBhv;
 import dbflute.exentity.Widget;
 import models.WidgetItem;
-import org.seasar.dbflute.cbean.ListResultBean;
+import org.dbflute.cbean.result.ListResultBean;
 import org.springframework.transaction.annotation.Transactional;
 import play.Logger;
 import play.data.Form;
@@ -54,10 +53,9 @@ public class WidgetController extends Controller {
     }
 
     private ListResultBean<Widget> selectWidgetList() {
-        final WidgetCB cb = new WidgetCB();
-        cb.query().addOrderBy_Id_Asc();
-
-        return widgetBhv.selectList(cb);
+        return widgetBhv.selectList(cb -> {
+            cb.query().addOrderBy_Id_Asc();
+        });
     }
 
 }

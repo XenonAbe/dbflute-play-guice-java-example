@@ -3,7 +3,7 @@ package app.db;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.QLog;
+import org.dbflute.system.QLog;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
@@ -44,9 +44,6 @@ class TransactionManagerWithDBFlute extends TransactionManager {
     }
 
     private static class QLogAccessor extends QLog {
-        public static boolean isQueryLogLevelInfo() {
-            return QLog.isQueryLogLevelInfo();
-        }
         public static boolean isLoggingInHolidayMood() {
             return QLog.isLoggingInHolidayMood();
         }

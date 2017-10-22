@@ -2,8 +2,8 @@ package test.functional;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.dbflute.system.QLog;
 import org.junit.*;
-import org.seasar.dbflute.QLog;
 import org.springframework.transaction.UnexpectedRollbackException;
 import play.Logger;
 import play.test.FakeApplication;
@@ -29,17 +29,15 @@ public class TransactionTest {
         app = Helpers.fakeApplication();
         Helpers.start(app);
         transactionTestService = TestUtils.instanceOf(app, TransactionTestService.class);
-
-        QLog.unlock();
     }
 
     @AfterClass
     public static void stop() {
-        if (QLog.isLogEnabled())
-            QLog.setLoggingInHolidayMood(true);
+        QLog.unlock();
+        QLog.setLoggingInHolidayMood(true);
         transactionTestService.termination();
+        QLog.unlock();
         QLog.setLoggingInHolidayMood(false);
-        QLog.lock();
 
         transactionTestService = null;
 
@@ -53,9 +51,10 @@ public class TransactionTest {
     public void setup() {
         DBFluteTestUtils.setAccessContextInTest();
 
-        if (QLog.isLogEnabled())
-            QLog.setLoggingInHolidayMood(true);
+        QLog.unlock();
+        QLog.setLoggingInHolidayMood(true);
         transactionTestService.initialize();
+        QLog.unlock();
         QLog.setLoggingInHolidayMood(false);
     }
 
@@ -65,9 +64,10 @@ public class TransactionTest {
     }
 
     private List<String> selectResultValues() {
-        if (QLog.isLogEnabled())
-            QLog.setLoggingInHolidayMood(true);
+        QLog.unlock();
+        QLog.setLoggingInHolidayMood(true);
         final List<String> result = transactionTestService.selectValues();
+        QLog.unlock();
         QLog.setLoggingInHolidayMood(false);
         return result;
     }

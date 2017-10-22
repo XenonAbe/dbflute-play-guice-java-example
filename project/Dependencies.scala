@@ -8,8 +8,6 @@ object Dependencies {
 
   val guice = "com.google.inject" % "guice" % Dependencies.guiceVersion
 
-  val dbFluteVersion = "1.0.5N"
-  val dbfluteRuntime = "org.seasar.dbflute" % "dbflute-runtime" % dbFluteVersion
-
-  val additionalResolvers = "The Seasar Foundation Maven2 Repository" at "http://maven.seasar.org/maven2"
+  val dbFluteVersion = "1.1.4"
+  val dbfluteRuntime = "org.dbflute" % "dbflute-runtime" % dbFluteVersion
 }

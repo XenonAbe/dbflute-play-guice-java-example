@@ -2,7 +2,7 @@ package app.db;
 
 import app.core.Constants;
 import com.google.inject.AbstractModule;
-import org.seasar.dbflute.AccessContext;
+import org.dbflute.hook.AccessContext;
 import play.Application;
 import play.api.db.Database;
 import play.mvc.Http;

@@ -1,9 +1,7 @@
 package test.functional;
 
-import dbflute.cbean.WidgetCB;
 import dbflute.exbhv.WidgetBhv;
 import dbflute.exentity.Widget;
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,8 +11,8 @@ import play.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 public class TransactionTestService {
@@ -438,37 +436,29 @@ public class TransactionTestService {
     }
 
     public List<String> selectValues() {
-        final WidgetCB cb = new WidgetCB();
-        cb.query().setName_LikeSearch(ValuePrefix, new LikeSearchOption().likePrefix());
-        cb.query().addOrderBy_Name_Asc();
-        cb.specify().columnName();
-
-        List<Widget> list = widgetBhv.selectList(cb);
-
-        List<String> result = new ArrayList<>();
-        for (Widget entity : list) {
-            result.add(entity.getName());
-        }
-
-        return result;
+        return widgetBhv.selectList(cb -> {
+            cb.query().setName_LikeSearch(ValuePrefix, option -> option.likePrefix());
+            cb.query().addOrderBy_Name_Asc();
+            cb.specify().columnName();
+        })
+                .stream().map(entity -> entity.getName()).collect(Collectors.toList());
     }
 
     private void insertInternal(List<String> values) {
-        for (String value : values) {
+        values.stream().forEach(value -> {
             Widget entity = new Widget();
             entity.setName(value);
             entity.setPrice(0);
             widgetBhv.insert(entity);
-        }
+        });
     }
 
     /**
      * テストで使用する, ValuePrefixで始まるデータをすべて削除
      */
     private void deleteAll() {
-        final WidgetCB cb = new WidgetCB();
-        cb.query().setName_LikeSearch(ValuePrefix, new LikeSearchOption().likePrefix());
-
-        widgetBhv.queryDelete(cb);
+        widgetBhv.queryDelete(cb -> {
+            cb.query().setName_LikeSearch(ValuePrefix, option -> option.likePrefix());
+        });
     }
 }
