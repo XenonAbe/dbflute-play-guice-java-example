@@ -2,12 +2,12 @@ package dbflute.bsbhv.loader;
 
 import java.util.List;
 
-import org.seasar.dbflute.*;
+import org.dbflute.bhv.*;
 import dbflute.exbhv.*;
 import dbflute.exentity.*;
 
 /**
- * The referrer loader of WIDGET as TABLE. <br />
+ * The referrer loader of WIDGET as TABLE. <br>
  * <pre>
  * [primary key]
  *     ID

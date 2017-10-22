@@ -4,15 +4,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.BehaviorReadable;
-import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.exception.IllegalBehaviorStateException;
-import org.seasar.dbflute.util.DfTraceViewUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.dbflute.bhv.BehaviorReadable;
+import org.dbflute.bhv.BehaviorSelector;
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.exception.IllegalBehaviorStateException;
+import org.dbflute.util.DfTraceViewUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -26,8 +26,8 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(ImplementedBehaviorSelector.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(ImplementedBehaviorSelector.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -102,8 +102,8 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
      * Select behavior (as readable type) by name.
      * @param tableFlexibleName The flexible-name of table. (NotNull)
      * @return The instance of found behavior. (NotNull)
-     * @throws org.seasar.dbflute.exception.DBMetaNotFoundException When the table is not found.
-     * @throws org.seasar.dbflute.exception.IllegalBehaviorStateException When the behavior class is suppressed.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the table is not found.
+     * @throws org.dbflute.exception.IllegalBehaviorStateException When the behavior class is suppressed.
      */
     public BehaviorReadable byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
@@ -115,7 +115,7 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
      * Get behavior-type by DB meta.
      * @param dbmeta The instance of DB meta for the behavior. (NotNull)
      * @return The type of behavior (as readable type). (NotNull)
-     * @throws org.seasar.dbflute.exception.IllegalBehaviorStateException When the behavior class is suppressed.
+     * @throws org.dbflute.exception.IllegalBehaviorStateException When the behavior class is suppressed.
      */
     @SuppressWarnings("unchecked")
     protected Class<BehaviorReadable> getBehaviorType(DBMeta dbmeta) {
@@ -169,9 +169,9 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
+     * @throws IllegalArgumentException When the variable name or the variable is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -189,8 +189,9 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
+     * @throws IllegalArgumentException When the argument is null or empty.
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);

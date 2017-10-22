@@ -3,12 +3,12 @@ package dbflute.bsentity.dbmeta;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.dbmeta.AbstractDBMeta;
-import org.seasar.dbflute.dbmeta.info.*;
-import org.seasar.dbflute.dbmeta.name.*;
-import org.seasar.dbflute.dbmeta.property.PropertyGateway;
+import org.dbflute.Entity;
+import org.dbflute.dbmeta.AbstractDBMeta;
+import org.dbflute.dbmeta.info.*;
+import org.dbflute.dbmeta.name.*;
+import org.dbflute.dbmeta.property.PropertyGateway;
+import org.dbflute.dbway.DBDef;
 import dbflute.allcommon.*;
 import dbflute.exentity.*;
 
@@ -28,6 +28,9 @@ public class WidgetDbm extends AbstractDBMeta {
     // ===================================================================================
     //                                                                       Current DBDef
     //                                                                       =============
+    public String getProjectName() { return DBCurrent.getInstance().projectName(); }
+    public String getProjectPrefix() { return DBCurrent.getInstance().projectPrefix(); }
+    public String getGenerationGapBasePrefix() { return DBCurrent.getInstance().generationGapBasePrefix(); }
     public DBDef getCurrentDBDef() { return DBCurrent.getInstance().currentDBDef(); }
 
     // ===================================================================================
@@ -37,47 +40,16 @@ public class WidgetDbm extends AbstractDBMeta {
     //                                       Column Property
     //                                       ---------------
     protected final Map<String, PropertyGateway> _epgMap = newHashMap();
-    {
-        setupEpg(_epgMap, new EpgId(), "id");
-        setupEpg(_epgMap, new EpgName(), "name");
-        setupEpg(_epgMap, new EpgPrice(), "price");
-        setupEpg(_epgMap, new EpgRegisterDatetime(), "registerDatetime");
-        setupEpg(_epgMap, new EpgRegisterUser(), "registerUser");
-        setupEpg(_epgMap, new EpgUpdateDatetime(), "updateDatetime");
-        setupEpg(_epgMap, new EpgUpdateUser(), "updateUser");
-        setupEpg(_epgMap, new EpgVersionNo(), "versionNo");
-    }
-    public static class EpgId implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getId(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setId(cti(vl)); }
-    }
-    public static class EpgName implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getName(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setName((String)vl); }
-    }
-    public static class EpgPrice implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getPrice(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setPrice(cti(vl)); }
-    }
-    public static class EpgRegisterDatetime implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getRegisterDatetime(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setRegisterDatetime((java.sql.Timestamp)vl); }
-    }
-    public static class EpgRegisterUser implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getRegisterUser(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setRegisterUser((String)vl); }
-    }
-    public static class EpgUpdateDatetime implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getUpdateDatetime(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setUpdateDatetime((java.sql.Timestamp)vl); }
-    }
-    public static class EpgUpdateUser implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getUpdateUser(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setUpdateUser((String)vl); }
-    }
-    public static class EpgVersionNo implements PropertyGateway {
-        public Object read(Entity et) { return ((Widget)et).getVersionNo(); }
-        public void write(Entity et, Object vl) { ((Widget)et).setVersionNo(ctl(vl)); }
+    { xsetupEpg(); }
+    protected void xsetupEpg() {
+        setupEpg(_epgMap, et -> ((Widget)et).getId(), (et, vl) -> ((Widget)et).setId(cti(vl)), "id");
+        setupEpg(_epgMap, et -> ((Widget)et).getName(), (et, vl) -> ((Widget)et).setName((String)vl), "name");
+        setupEpg(_epgMap, et -> ((Widget)et).getPrice(), (et, vl) -> ((Widget)et).setPrice(cti(vl)), "price");
+        setupEpg(_epgMap, et -> ((Widget)et).getRegisterDatetime(), (et, vl) -> ((Widget)et).setRegisterDatetime(ctldt(vl)), "registerDatetime");
+        setupEpg(_epgMap, et -> ((Widget)et).getRegisterUser(), (et, vl) -> ((Widget)et).setRegisterUser((String)vl), "registerUser");
+        setupEpg(_epgMap, et -> ((Widget)et).getUpdateDatetime(), (et, vl) -> ((Widget)et).setUpdateDatetime(ctldt(vl)), "updateDatetime");
+        setupEpg(_epgMap, et -> ((Widget)et).getUpdateUser(), (et, vl) -> ((Widget)et).setUpdateUser((String)vl), "updateUser");
+        setupEpg(_epgMap, et -> ((Widget)et).getVersionNo(), (et, vl) -> ((Widget)et).setVersionNo(ctl(vl)), "versionNo");
     }
     public PropertyGateway findPropertyGateway(String prop)
     { return doFindEpg(_epgMap, prop); }
@@ -86,24 +58,26 @@ public class WidgetDbm extends AbstractDBMeta {
     //                                                                          Table Info
     //                                                                          ==========
     protected final String _tableDbName = "WIDGET";
+    protected final String _tableDispName = "WIDGET";
     protected final String _tablePropertyName = "widget";
     protected final TableSqlName _tableSqlName = new TableSqlName("WIDGET", _tableDbName);
     { _tableSqlName.xacceptFilter(DBFluteConfig.getInstance().getTableSqlNameFilter()); }
     public String getTableDbName() { return _tableDbName; }
+    public String getTableDispName() { return _tableDispName; }
     public String getTablePropertyName() { return _tablePropertyName; }
     public TableSqlName getTableSqlName() { return _tableSqlName; }
 
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
-    protected final ColumnInfo _columnId = cci("ID", "ID", null, null, Integer.class, "id", null, true, true, true, "INTEGER", 10, 0, "NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_48C08EA6_C1BA_4096_B638_6C37E207F2CE", false, null, null, null, null, null);
-    protected final ColumnInfo _columnName = cci("NAME", "NAME", null, null, String.class, "name", null, false, false, true, "VARCHAR", 50, 0, null, false, null, null, null, null, null);
-    protected final ColumnInfo _columnPrice = cci("PRICE", "PRICE", null, null, Integer.class, "price", null, false, false, true, "INTEGER", 10, 0, null, false, null, null, null, null, null);
-    protected final ColumnInfo _columnRegisterDatetime = cci("REGISTER_DATETIME", "REGISTER_DATETIME", null, null, java.sql.Timestamp.class, "registerDatetime", null, false, false, true, "TIMESTAMP", 23, 10, null, true, null, null, null, null, null);
-    protected final ColumnInfo _columnRegisterUser = cci("REGISTER_USER", "REGISTER_USER", null, null, String.class, "registerUser", null, false, false, true, "VARCHAR", 200, 0, null, true, null, null, null, null, null);
-    protected final ColumnInfo _columnUpdateDatetime = cci("UPDATE_DATETIME", "UPDATE_DATETIME", null, null, java.sql.Timestamp.class, "updateDatetime", null, false, false, true, "TIMESTAMP", 23, 10, null, true, null, null, null, null, null);
-    protected final ColumnInfo _columnUpdateUser = cci("UPDATE_USER", "UPDATE_USER", null, null, String.class, "updateUser", null, false, false, true, "VARCHAR", 200, 0, null, true, null, null, null, null, null);
-    protected final ColumnInfo _columnVersionNo = cci("VERSION_NO", "VERSION_NO", null, null, Long.class, "versionNo", null, false, false, true, "BIGINT", 19, 0, null, false, OptimisticLockType.VERSION_NO, null, null, null, null);
+    protected final ColumnInfo _columnId = cci("ID", "ID", null, null, Integer.class, "id", null, true, true, true, "INTEGER", 10, 0, null, "NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_4B46C640_73B9_4A6B_B7B4_DDE7A62188A1", false, null, null, null, null, null, false);
+    protected final ColumnInfo _columnName = cci("NAME", "NAME", null, null, String.class, "name", null, false, false, true, "VARCHAR", 50, 0, null, null, false, null, null, null, null, null, false);
+    protected final ColumnInfo _columnPrice = cci("PRICE", "PRICE", null, null, Integer.class, "price", null, false, false, true, "INTEGER", 10, 0, null, null, false, null, null, null, null, null, false);
+    protected final ColumnInfo _columnRegisterDatetime = cci("REGISTER_DATETIME", "REGISTER_DATETIME", null, null, java.time.LocalDateTime.class, "registerDatetime", null, false, false, true, "TIMESTAMP", 23, 10, null, null, true, null, null, null, null, null, false);
+    protected final ColumnInfo _columnRegisterUser = cci("REGISTER_USER", "REGISTER_USER", null, null, String.class, "registerUser", null, false, false, true, "VARCHAR", 200, 0, null, null, true, null, null, null, null, null, false);
+    protected final ColumnInfo _columnUpdateDatetime = cci("UPDATE_DATETIME", "UPDATE_DATETIME", null, null, java.time.LocalDateTime.class, "updateDatetime", null, false, false, true, "TIMESTAMP", 23, 10, null, null, true, null, null, null, null, null, false);
+    protected final ColumnInfo _columnUpdateUser = cci("UPDATE_USER", "UPDATE_USER", null, null, String.class, "updateUser", null, false, false, true, "VARCHAR", 200, 0, null, null, true, null, null, null, null, null, false);
+    protected final ColumnInfo _columnVersionNo = cci("VERSION_NO", "VERSION_NO", null, null, Long.class, "versionNo", null, false, false, true, "BIGINT", 19, 0, null, null, false, OptimisticLockType.VERSION_NO, null, null, null, null, false);
 
     /**
      * ID: {PK, ID, NotNull, INTEGER(10)}

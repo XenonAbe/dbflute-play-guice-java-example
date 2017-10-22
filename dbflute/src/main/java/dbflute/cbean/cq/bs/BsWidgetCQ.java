@@ -2,12 +2,12 @@ package dbflute.cbean.cq.bs;
 
 import java.util.Map;
 
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.coption.*;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.dbflute.cbean.*;
+import org.dbflute.cbean.chelper.*;
+import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import dbflute.cbean.cq.ciq.*;
 import dbflute.cbean.*;
 import dbflute.cbean.cq.*;
@@ -34,10 +34,10 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
     //                                                                 InlineView/OrClause
     //                                                                 ===================
     /**
-     * Prepare InlineView query. <br />
+     * Prepare InlineView query. <br>
      * {select ... from ... left outer join (select * from WIDGET) where FOO = [value] ...}
      * <pre>
-     * cb.query().queryMemberStatus().<span style="color: #DD4747">inline()</span>.setFoo...;
+     * cb.query().queryMemberStatus().<span style="color: #CC4747">inline()</span>.setFoo...;
      * </pre>
      * @return The condition-query for InlineView query. (NotNull)
      */
@@ -57,10 +57,10 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
     }
 
     /**
-     * Prepare OnClause query. <br />
+     * Prepare OnClause query. <br>
      * {select ... from ... left outer join WIDGET on ... and FOO = [value] ...}
      * <pre>
-     * cb.query().queryMemberStatus().<span style="color: #DD4747">on()</span>.setFoo...;
+     * cb.query().queryMemberStatus().<span style="color: #CC4747">on()</span>.setFoo...;
      * </pre>
      * @return The condition-query for OnClause query. (NotNull)
      * @throws IllegalConditionBeanOperationException When this condition-query is base query.
@@ -74,160 +74,160 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
     //                                                                               Query
     //                                                                               =====
     protected ConditionValue _id;
-    public ConditionValue getId()
+    public ConditionValue xdfgetId()
     { if (_id == null) { _id = nCV(); }
       return _id; }
-    protected ConditionValue getCValueId() { return getId(); }
+    protected ConditionValue xgetCValueId() { return xdfgetId(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * ID: {PK, ID, NotNull, INTEGER(10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_Id_Asc() { regOBA("ID"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * ID: {PK, ID, NotNull, INTEGER(10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_Id_Desc() { regOBD("ID"); return this; }
 
     protected ConditionValue _name;
-    public ConditionValue getName()
+    public ConditionValue xdfgetName()
     { if (_name == null) { _name = nCV(); }
       return _name; }
-    protected ConditionValue getCValueName() { return getName(); }
+    protected ConditionValue xgetCValueName() { return xdfgetName(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * NAME: {NotNull, VARCHAR(50)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_Name_Asc() { regOBA("NAME"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * NAME: {NotNull, VARCHAR(50)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_Name_Desc() { regOBD("NAME"); return this; }
 
     protected ConditionValue _price;
-    public ConditionValue getPrice()
+    public ConditionValue xdfgetPrice()
     { if (_price == null) { _price = nCV(); }
       return _price; }
-    protected ConditionValue getCValuePrice() { return getPrice(); }
+    protected ConditionValue xgetCValuePrice() { return xdfgetPrice(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * PRICE: {NotNull, INTEGER(10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_Price_Asc() { regOBA("PRICE"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * PRICE: {NotNull, INTEGER(10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_Price_Desc() { regOBD("PRICE"); return this; }
 
     protected ConditionValue _registerDatetime;
-    public ConditionValue getRegisterDatetime()
+    public ConditionValue xdfgetRegisterDatetime()
     { if (_registerDatetime == null) { _registerDatetime = nCV(); }
       return _registerDatetime; }
-    protected ConditionValue getCValueRegisterDatetime() { return getRegisterDatetime(); }
+    protected ConditionValue xgetCValueRegisterDatetime() { return xdfgetRegisterDatetime(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_RegisterDatetime_Asc() { regOBA("REGISTER_DATETIME"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_RegisterDatetime_Desc() { regOBD("REGISTER_DATETIME"); return this; }
 
     protected ConditionValue _registerUser;
-    public ConditionValue getRegisterUser()
+    public ConditionValue xdfgetRegisterUser()
     { if (_registerUser == null) { _registerUser = nCV(); }
       return _registerUser; }
-    protected ConditionValue getCValueRegisterUser() { return getRegisterUser(); }
+    protected ConditionValue xgetCValueRegisterUser() { return xdfgetRegisterUser(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * REGISTER_USER: {NotNull, VARCHAR(200)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_RegisterUser_Asc() { regOBA("REGISTER_USER"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * REGISTER_USER: {NotNull, VARCHAR(200)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_RegisterUser_Desc() { regOBD("REGISTER_USER"); return this; }
 
     protected ConditionValue _updateDatetime;
-    public ConditionValue getUpdateDatetime()
+    public ConditionValue xdfgetUpdateDatetime()
     { if (_updateDatetime == null) { _updateDatetime = nCV(); }
       return _updateDatetime; }
-    protected ConditionValue getCValueUpdateDatetime() { return getUpdateDatetime(); }
+    protected ConditionValue xgetCValueUpdateDatetime() { return xdfgetUpdateDatetime(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_UpdateDatetime_Asc() { regOBA("UPDATE_DATETIME"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_UpdateDatetime_Desc() { regOBD("UPDATE_DATETIME"); return this; }
 
     protected ConditionValue _updateUser;
-    public ConditionValue getUpdateUser()
+    public ConditionValue xdfgetUpdateUser()
     { if (_updateUser == null) { _updateUser = nCV(); }
       return _updateUser; }
-    protected ConditionValue getCValueUpdateUser() { return getUpdateUser(); }
+    protected ConditionValue xgetCValueUpdateUser() { return xdfgetUpdateUser(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * UPDATE_USER: {NotNull, VARCHAR(200)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_UpdateUser_Asc() { regOBA("UPDATE_USER"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * UPDATE_USER: {NotNull, VARCHAR(200)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_UpdateUser_Desc() { regOBD("UPDATE_USER"); return this; }
 
     protected ConditionValue _versionNo;
-    public ConditionValue getVersionNo()
+    public ConditionValue xdfgetVersionNo()
     { if (_versionNo == null) { _versionNo = nCV(); }
       return _versionNo; }
-    protected ConditionValue getCValueVersionNo() { return getVersionNo(); }
+    protected ConditionValue xgetCValueVersionNo() { return xdfgetVersionNo(); }
 
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * VERSION_NO: {NotNull, BIGINT(19)}
      * @return this. (NotNull)
      */
     public BsWidgetCQ addOrderBy_VersionNo_Asc() { regOBA("VERSION_NO"); return this; }
 
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * VERSION_NO: {NotNull, BIGINT(19)}
      * @return this. (NotNull)
      */
@@ -243,9 +243,9 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseDatetime();
      *     }
-     * }, <span style="color: #DD4747">aliasName</span>);
+     * }, <span style="color: #CC4747">aliasName</span>);
      * <span style="color: #3F7E5E">// order by [alias-name] asc</span>
-     * cb.<span style="color: #DD4747">addSpecifiedDerivedOrderBy_Asc</span>(<span style="color: #DD4747">aliasName</span>);
+     * cb.<span style="color: #CC4747">addSpecifiedDerivedOrderBy_Asc</span>(<span style="color: #CC4747">aliasName</span>);
      * </pre>
      * @param aliasName The alias name specified at (Specify)DerivedReferrer. (NotNull)
      * @return this. (NotNull)
@@ -259,9 +259,9 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseDatetime();
      *     }
-     * }, <span style="color: #DD4747">aliasName</span>);
+     * }, <span style="color: #CC4747">aliasName</span>);
      * <span style="color: #3F7E5E">// order by [alias-name] desc</span>
-     * cb.<span style="color: #DD4747">addSpecifiedDerivedOrderBy_Desc</span>(<span style="color: #DD4747">aliasName</span>);
+     * cb.<span style="color: #CC4747">addSpecifiedDerivedOrderBy_Desc</span>(<span style="color: #CC4747">aliasName</span>);
      * </pre>
      * @param aliasName The alias name specified at (Specify)DerivedReferrer. (NotNull)
      * @return this. (NotNull)
@@ -284,31 +284,31 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
     // ===================================================================================
     //                                                                     ScalarCondition
     //                                                                     ===============
-    public Map<String, WidgetCQ> getScalarCondition() { return xgetSQueMap("scalarCondition"); }
+    public Map<String, WidgetCQ> xdfgetScalarCondition() { return xgetSQueMap("scalarCondition"); }
     public String keepScalarCondition(WidgetCQ sq) { return xkeepSQue("scalarCondition", sq); }
 
     // ===================================================================================
     //                                                                       MyselfDerived
     //                                                                       =============
-    public Map<String, WidgetCQ> getSpecifyMyselfDerived() { return xgetSQueMap("specifyMyselfDerived"); }
+    public Map<String, WidgetCQ> xdfgetSpecifyMyselfDerived() { return xgetSQueMap("specifyMyselfDerived"); }
     public String keepSpecifyMyselfDerived(WidgetCQ sq) { return xkeepSQue("specifyMyselfDerived", sq); }
 
-    public Map<String, WidgetCQ> getQueryMyselfDerived() { return xgetSQueMap("queryMyselfDerived"); }
+    public Map<String, WidgetCQ> xdfgetQueryMyselfDerived() { return xgetSQueMap("queryMyselfDerived"); }
     public String keepQueryMyselfDerived(WidgetCQ sq) { return xkeepSQue("queryMyselfDerived", sq); }
-    public Map<String, Object> getQueryMyselfDerivedParameter() { return xgetSQuePmMap("queryMyselfDerived"); }
+    public Map<String, Object> xdfgetQueryMyselfDerivedParameter() { return xgetSQuePmMap("queryMyselfDerived"); }
     public String keepQueryMyselfDerivedParameter(Object pm) { return xkeepSQuePm("queryMyselfDerived", pm); }
 
     // ===================================================================================
     //                                                                        MyselfExists
     //                                                                        ============
     protected Map<String, WidgetCQ> _myselfExistsMap;
-    public Map<String, WidgetCQ> getMyselfExists() { return xgetSQueMap("myselfExists"); }
+    public Map<String, WidgetCQ> xdfgetMyselfExists() { return xgetSQueMap("myselfExists"); }
     public String keepMyselfExists(WidgetCQ sq) { return xkeepSQue("myselfExists", sq); }
 
     // ===================================================================================
     //                                                                       MyselfInScope
     //                                                                       =============
-    public Map<String, WidgetCQ> getMyselfInScope() { return xgetSQueMap("myselfInScope"); }
+    public Map<String, WidgetCQ> xdfgetMyselfInScope() { return xgetSQueMap("myselfInScope"); }
     public String keepMyselfInScope(WidgetCQ sq) { return xkeepSQue("myselfInScope", sq); }
 
     // ===================================================================================
@@ -317,7 +317,7 @@ public class BsWidgetCQ extends AbstractBsWidgetCQ {
     // very internal (for suppressing warn about 'Not Use Import')
     protected String xCB() { return WidgetCB.class.getName(); }
     protected String xCQ() { return WidgetCQ.class.getName(); }
-    protected String xCHp() { return HpCalculator.class.getName(); }
+    protected String xCHp() { return HpQDRFunction.class.getName(); }
     protected String xCOp() { return ConditionOption.class.getName(); }
     protected String xMap() { return Map.class.getName(); }
 }

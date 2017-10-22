@@ -2,31 +2,33 @@ package dbflute.allcommon;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
-import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
-import org.seasar.dbflute.exception.factory.DefaultSQLExceptionHandlerFactory;
-import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
-import org.seasar.dbflute.jdbc.DataSourceHandler;
-import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
-import org.seasar.dbflute.jdbc.SQLExceptionDigger;
-import org.seasar.dbflute.jdbc.StatementConfig;
-import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.optional.RelationOptionalFactory;
-import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
-import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
-import org.seasar.dbflute.resource.ResourceParameter;
-import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
-import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
-import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.seasar.dbflute.twowaysql.factory.DefaultSqlAnalyzerFactory;
-import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.bhv.core.context.ResourceParameter;
+import org.dbflute.bhv.core.melodicsql.MelodicSqlAnalyzerFactory;
+import org.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
+import org.dbflute.bhv.exception.DefaultSQLExceptionHandlerFactory;
+import org.dbflute.bhv.exception.SQLExceptionHandlerFactory;
+import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.dbway.DBDef;
+import org.dbflute.jdbc.DataSourceHandler;
+import org.dbflute.jdbc.HandlingDataSourceWrapper;
+import org.dbflute.jdbc.SQLExceptionDigger;
+import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.jdbc.StatementFactory;
+import org.dbflute.optional.RelationOptionalFactory;
+import org.dbflute.outsidesql.OutsideSqlOption;
+import org.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
+import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
+import org.dbflute.s2dao.jdbc.TnResultSetHandlerFactory;
+import org.dbflute.s2dao.jdbc.TnResultSetHandlerFactoryImpl;
+import org.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
+import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
+import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -58,11 +60,12 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     protected volatile SqlClauseCreator _sqlClauseCreator;
     protected volatile StatementFactory _statementFactory;
     protected volatile TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected volatile TnResultSetHandlerFactory _resultSetHandlerFactory;
+    protected volatile RelationOptionalFactory _relationOptionalFactory;
     protected volatile SqlAnalyzerFactory _sqlAnalyzerFactory;
     protected volatile OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
     protected volatile SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
     protected volatile SequenceCacheHandler _sequenceCacheHandler;
-    protected volatile RelationOptionalFactory _relationOptionalFactory;
 
     // -----------------------------------------------------
     //                                       Disposable Flag
@@ -75,6 +78,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                         Current DBDef
     //                                         -------------
+    /** {@inheritDoc} */
     public DBDef assistCurrentDBDef() {
         return DBCurrent.getInstance().currentDBDef();
     }
@@ -82,6 +86,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                           Data Source
     //                                           -----------
+    /** {@inheritDoc} */
     public DataSource assistDataSource() { // DI component
         // this instance will be cached in SQL executions
         // so the handler should be set before initialization of DBFlute
@@ -93,6 +98,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                       DBMeta Provider
     //                                       ---------------
+    /** {@inheritDoc} */
     public DBMetaProvider assistDBMetaProvider() { // lazy component
         if (_dbmetaProvider != null) {
             return _dbmetaProvider;
@@ -113,6 +119,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                    SQL Clause Creator
     //                                    ------------------
+    /** {@inheritDoc} */
     public SqlClauseCreator assistSqlClauseCreator() { // lazy component
         if (_sqlClauseCreator != null) {
             return _sqlClauseCreator;
@@ -141,6 +148,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                     Statement Factory
     //                                     -----------------
+    /** {@inheritDoc} */
     public StatementFactory assistStatementFactory() { // lazy component
         if (_statementFactory != null) {
             return _statementFactory;
@@ -155,9 +163,9 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     }
 
     protected StatementFactory createStatementFactory() {
-        final DBFluteConfig config = DBFluteConfig.getInstance();
         final TnStatementFactoryImpl factory = newStatementFactoryImpl();
         factory.setDefaultStatementConfig(assistDefaultStatementConfig());
+        DBFluteConfig config = DBFluteConfig.getInstance();
         factory.setInternalDebug(config.isInternalDebug());
         factory.setCursorSelectFetchSize(config.getCursorSelectFetchSize());
         factory.setEntitySelectFetchSize(config.getEntitySelectFetchSize());
@@ -173,6 +181,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                Bean Meta Data Factory
     //                                ----------------------
+    /** {@inheritDoc} */
     public TnBeanMetaDataFactory assistBeanMetaDataFactory() { // lazy component
         if (_beanMetaDataFactory != null) {
             return _beanMetaDataFactory;
@@ -199,11 +208,34 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     }
 
     // -----------------------------------------------------
+    //                            Result Set Handler Factory
+    //                            --------------------------
+    /** {@inheritDoc} */
+    public TnResultSetHandlerFactory assistResultSetHandlerFactory() { // lazy component
+        if (_resultSetHandlerFactory != null) {
+            return _resultSetHandlerFactory;
+        }
+        synchronized (this) {
+            if (_resultSetHandlerFactory != null) {
+                return _resultSetHandlerFactory;
+            }
+            _resultSetHandlerFactory = createResultSetHandlerFactory();
+        }
+        return _resultSetHandlerFactory;
+    }
+
+    protected TnResultSetHandlerFactory createResultSetHandlerFactory() {
+        return newResultSetHandlerFactoryImpl();
+    }
+
+    protected TnResultSetHandlerFactoryImpl newResultSetHandlerFactoryImpl() {
+        return new TnResultSetHandlerFactoryImpl();
+    }
+
+    // -----------------------------------------------------
     //                             Relation Optional Factory
     //                             -------------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public RelationOptionalFactory assistRelationOptionalFactory() {
         if (_relationOptionalFactory != null) {
             return _relationOptionalFactory;
@@ -228,9 +260,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                  SQL Analyzer Factory
     //                                  --------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SqlAnalyzerFactory assistSqlAnalyzerFactory() { // lazy component
         if (_sqlAnalyzerFactory != null) {
             return _sqlAnalyzerFactory;
@@ -245,11 +275,11 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     }
 
     protected SqlAnalyzerFactory createSqlAnalyzerFactory() {
-        return newDefaultSqlAnalyzerFactory();
+        return newMelodicSqlAnalyzerFactory();
     }
 
-    protected DefaultSqlAnalyzerFactory newDefaultSqlAnalyzerFactory() {
-        return new DefaultSqlAnalyzerFactory();
+    protected MelodicSqlAnalyzerFactory newMelodicSqlAnalyzerFactory() {
+        return new MelodicSqlAnalyzerFactory();
     }
 
     // -----------------------------------------------------
@@ -272,9 +302,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                           OutsideSql Executor Factory
     //                           ---------------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory() {
         if (_outsideSqlExecutorFactory != null) {
             return _outsideSqlExecutorFactory;
@@ -303,9 +331,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                   SQLException Digger
     //                                   -------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SQLExceptionDigger assistSQLExceptionDigger() {
         return createSQLExceptionDigger();
     }
@@ -317,9 +343,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                          SQLException Handler Factory
     //                          ----------------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SQLExceptionHandlerFactory assistSQLExceptionHandlerFactory() { // lazy component
         if (_sqlExceptionHandlerFactory != null) {
             return _sqlExceptionHandlerFactory;
@@ -344,9 +368,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                Sequence Cache Handler
     //                                ----------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SequenceCacheHandler assistSequenceCacheHandler() { // lazy component
         if (_sequenceCacheHandler != null) {
             return _sequenceCacheHandler;
@@ -377,6 +399,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                     SQL File Encoding
     //                                     -----------------
+    /** {@inheritDoc} */
     public String assistSqlFileEncoding() {
         return "UTF-8";
     }
@@ -384,6 +407,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                               Statement Configuration
     //                               -----------------------
+    /** {@inheritDoc} */
     public StatementConfig assistDefaultStatementConfig() {
         return DBFluteConfig.getInstance().getDefaultStatementConfig();
     }
@@ -391,6 +415,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                            Behavior Exception Thrower
     //                            --------------------------
+    /** {@inheritDoc} */
     public BehaviorExceptionThrower assistBehaviorExceptionThrower() {
         return new BehaviorExceptionThrower();
     }
@@ -398,6 +423,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                 Geared Cipher Manager
     //                                 ---------------------
+    /** {@inheritDoc} */
     public GearedCipherManager assistGearedCipherManager() {
         return DBFluteConfig.getInstance().getGearedCipherManager();
     }
@@ -405,6 +431,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                    Resource Parameter
     //                                    ------------------
+    /** {@inheritDoc} */
     public ResourceParameter assistResourceParameter() {
         return createResourceParameter();
     }
@@ -412,8 +439,11 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     protected ResourceParameter createResourceParameter() {
         ResourceParameter parameter = newResourceParameter();
         parameter.setOutsideSqlPackage(DBFluteConfig.getInstance().getOutsideSqlPackage());
-        parameter.setLogDateFormat(DBFluteConfig.getInstance().getLogDateFormat());
-        parameter.setLogTimestampFormat(DBFluteConfig.getInstance().getLogTimestampFormat());
+        parameter.setMappingDateTimeZoneProvider(DBFluteConfig.getInstance().getMappingDateTimeZoneProvider());
+        parameter.setLogDatePattern(DBFluteConfig.getInstance().getLogDatePattern());
+        parameter.setLogTimestampPattern(DBFluteConfig.getInstance().getLogTimestampPattern());
+        parameter.setLogTimePattern(DBFluteConfig.getInstance().getLogTimePattern());
+        parameter.setLogTimeZoneProvider(DBFluteConfig.getInstance().getLogTimeZoneProvider());
         parameter.setInternalDebug(DBFluteConfig.getInstance().isInternalDebug());
         return parameter;
     }
@@ -425,10 +455,12 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // -----------------------------------------------------
     //                                          Invoke Names
     //                                          ------------
+    /** {@inheritDoc} */
     public String[] assistClientInvokeNames() {
         return DEFAULT_CLIENT_INVOKE_NAMES;
     }
 
+    /** {@inheritDoc} */
     public String[] assistByPassInvokeNames() {
         return DEFAULT_BYPASS_INVOKE_NAMES;
     }
@@ -436,6 +468,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // ===================================================================================
     //                                                                             Dispose
     //                                                                             =======
+    /** {@inheritDoc} */
     public void toBeDisposable(final DisposableProcess callerProcess) { // for HotDeploy
         // do nothing: unsupported at this DI container
     }
@@ -454,8 +487,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // to check the initializer is an instance of DBFluteInitializer
     // when the initializer is extended by DBFlute property
     // so this variable is actually unused in this class
-    // (needs to be injected only when the DI container
-    // is set by its DI setting file)
+    // (needs to be injected only when the DI container is set by its DI setting file)
     public void setIntroduction(DBFluteInitializer introduction) {
         _introduction = introduction;
     }

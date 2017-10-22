@@ -1,19 +1,17 @@
 package dbflute.cbean.bs;
 
-import org.seasar.dbflute.cbean.AbstractConditionBean;
-import org.seasar.dbflute.cbean.AndQuery;
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionQuery;
-import org.seasar.dbflute.cbean.OrQuery;
-import org.seasar.dbflute.cbean.SpecifyQuery;
-import org.seasar.dbflute.cbean.SubQuery;
-import org.seasar.dbflute.cbean.UnionQuery;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.coption.*;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.cbean.AbstractConditionBean;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.ConditionQuery;
+import org.dbflute.cbean.chelper.*;
+import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.dream.*;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.cbean.scoping.*;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 import dbflute.allcommon.DBFluteConfig;
 import dbflute.allcommon.DBMetaInstanceHandler;
 import dbflute.allcommon.ImplementedInvokerAssistant;
@@ -45,6 +43,9 @@ public class BsWidgetCB extends AbstractConditionBean {
         if (DBFluteConfig.getInstance().isNonSpecifiedColumnAccessAllowed()) {
             enableNonSpecifiedColumnAccess();
         }
+        if (DBFluteConfig.getInstance().isSpecifyColumnRequired()) {
+            enableSpecifyColumnRequired();
+        }
         if (DBFluteConfig.getInstance().isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
         }
@@ -63,17 +64,14 @@ public class BsWidgetCB extends AbstractConditionBean {
     }
 
     // ===================================================================================
-    //                                                                     DBMeta Provider
-    //                                                                     ===============
+    //                                                                             DB Meta
+    //                                                                             =======
     @Override
     protected DBMetaProvider getDBMetaProvider() {
         return DBMetaInstanceHandler.getProvider(); // as default
     }
 
-    // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
-    public String getTableDbName() {
+    public String asTableDbName() {
         return "WIDGET";
     }
 
@@ -106,7 +104,7 @@ public class BsWidgetCB extends AbstractConditionBean {
     //                                                                               Query
     //                                                                               =====
     /**
-     * Prepare for various queries. <br />
+     * Prepare for various queries. <br>
      * Examples of main functions are following:
      * <pre>
      * <span style="color: #3F7E5E">// Basic Queries</span>
@@ -118,7 +116,6 @@ public class BsWidgetCB extends AbstractConditionBean {
      * cb.query().setMemberId_LessEqual(value);    <span style="color: #3F7E5E">// &lt;=</span>
      * cb.query().setMemberName_InScope(valueList);    <span style="color: #3F7E5E">// in ('a', 'b')</span>
      * cb.query().setMemberName_NotInScope(valueList); <span style="color: #3F7E5E">// not in ('a', 'b')</span>
-     * cb.query().setMemberName_PrefixSearch(value);   <span style="color: #3F7E5E">// like 'a%' escape '|'</span>
      * <span style="color: #3F7E5E">// LikeSearch with various options: (versatile)</span>
      * <span style="color: #3F7E5E">// {like ... [options]}</span>
      * cb.query().setMemberName_LikeSearch(value, option);
@@ -128,47 +125,31 @@ public class BsWidgetCB extends AbstractConditionBean {
      * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
      * <span style="color: #3F7E5E">// DateFromTo: (Date means yyyy/MM/dd)</span>
      * <span style="color: #3F7E5E">// {fromDate &lt;= BIRTHDATE &lt; toDate + 1 day}</span>
-     * cb.query().setBirthdate_DateFromTo(fromDate, toDate);
      * cb.query().setBirthdate_IsNull();    <span style="color: #3F7E5E">// is null</span>
      * cb.query().setBirthdate_IsNotNull(); <span style="color: #3F7E5E">// is not null</span>
      * 
      * <span style="color: #3F7E5E">// ExistsReferrer: (correlated sub-query)</span>
      * <span style="color: #3F7E5E">// {where exists (select PURCHASE_ID from PURCHASE where ...)}</span>
-     * cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.query().setXxx... <span style="color: #3F7E5E">// referrer sub-query condition</span>
-     *     }
+     * cb.query().existsPurchase(purchaseCB <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     purchaseCB.query().set... <span style="color: #3F7E5E">// referrer sub-query condition</span>
      * });
-     * cb.query().notExistsPurchaseList...
-     * 
-     * <span style="color: #3F7E5E">// InScopeRelation: (sub-query)</span>
-     * <span style="color: #3F7E5E">// {where MEMBER_STATUS_CODE in (select MEMBER_STATUS_CODE from MEMBER_STATUS where ...)}</span>
-     * cb.query().inScopeMemberStatus(new SubQuery&lt;MemberStatusCB&gt;() {
-     *     public void query(MemberStatusCB subCB) {
-     *         subCB.query().setXxx... <span style="color: #3F7E5E">// relation sub-query condition</span>
-     *     }
-     * });
-     * cb.query().notInScopeMemberStatus...
+     * cb.query().notExistsPurchase...
      * 
      * <span style="color: #3F7E5E">// (Query)DerivedReferrer: (correlated sub-query)</span>
-     * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// derived column for function</span>
-     *         subCB.query().setXxx... <span style="color: #3F7E5E">// referrer sub-query condition</span>
-     *     }
+     * cb.query().derivedPurchaseList().max(purchaseCB <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     purchaseCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// derived column for function</span>
+     *     purchaseCB.query().set... <span style="color: #3F7E5E">// referrer sub-query condition</span>
      * }).greaterEqual(value);
      * 
      * <span style="color: #3F7E5E">// ScalarCondition: (self-table sub-query)</span>
-     * cb.query().scalar_Equal().max(new SubQuery&lt;MemberCB&gt;() {
-     *     public void query(MemberCB subCB) {
-     *         subCB.specify().columnBirthdate(); <span style="color: #3F7E5E">// derived column for function</span>
-     *         subCB.query().setXxx... <span style="color: #3F7E5E">// scalar sub-query condition</span>
-     *     }
+     * cb.query().scalar_Equal().max(scalarCB <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     scalarCB.specify().columnBirthdate(); <span style="color: #3F7E5E">// derived column for function</span>
+     *     scalarCB.query().set... <span style="color: #3F7E5E">// scalar sub-query condition</span>
      * });
      * 
      * <span style="color: #3F7E5E">// OrderBy</span>
      * cb.query().addOrderBy_MemberName_Asc();
-     * cb.query().addOrderBy_MemberName_Desc().withManualOrder(valueList);
+     * cb.query().addOrderBy_MemberName_Desc().withManualOrder(option);
      * cb.query().addOrderBy_MemberName_Desc().withNullsFirst();
      * cb.query().addOrderBy_MemberName_Desc().withNullsLast();
      * cb.query().addSpecifiedDerivedOrderBy_Desc(aliasName);
@@ -181,10 +162,14 @@ public class BsWidgetCB extends AbstractConditionBean {
      */
     public WidgetCQ query() {
         assertQueryPurpose(); // assert only when user-public query 
-        return getConditionQuery();
+        return doGetConditionQuery();
     }
 
-    public WidgetCQ getConditionQuery() { // public for parameter comment and internal
+    public WidgetCQ xdfgetConditionQuery() { // public for parameter comment and internal
+        return doGetConditionQuery();
+    }
+
+    protected WidgetCQ doGetConditionQuery() {
         if (_conditionQuery == null) {
             _conditionQuery = createLocalCQ();
         }
@@ -205,48 +190,47 @@ public class BsWidgetCB extends AbstractConditionBean {
         return new WidgetCQ(childQuery, sqlClause, aliasName, nestLevel);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ConditionQuery localCQ() {
-        return getConditionQuery();
+        return doGetConditionQuery();
     }
 
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
     /**
-     * Set up 'union' for base-point table. <br />
+     * Set up 'union' for base-point table. <br>
      * You don't need to call SetupSelect in union-query,
      * because it inherits calls before. (Don't call SetupSelect after here)
      * <pre>
-     * cb.query().<span style="color: #DD4747">union</span>(new UnionQuery&lt;WidgetCB&gt;() {
-     *     public void query(WidgetCB unionCB) {
-     *         unionCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">union</span>(<span style="color: #553000">unionCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">unionCB</span>.query().set...
      * });
      * </pre>
-     * @param unionQuery The query of 'union'. (NotNull)
+     * @param unionCBLambda The callback for query of 'union'. (NotNull)
      */
-    public void union(UnionQuery<WidgetCB> unionQuery) {
+    public void union(UnionQuery<WidgetCB> unionCBLambda) {
         final WidgetCB cb = new WidgetCB(); cb.xsetupForUnion(this); xsyncUQ(cb); 
-        try { lock(); unionQuery.query(cb); } finally { unlock(); } xsaveUCB(cb);
+        try { lock(); unionCBLambda.query(cb); } finally { unlock(); } xsaveUCB(cb);
         final WidgetCQ cq = cb.query(); query().xsetUnionQuery(cq);
     }
 
     /**
-     * Set up 'union all' for base-point table. <br />
+     * Set up 'union all' for base-point table. <br>
      * You don't need to call SetupSelect in union-query,
      * because it inherits calls before. (Don't call SetupSelect after here)
      * <pre>
-     * cb.query().<span style="color: #DD4747">unionAll</span>(new UnionQuery&lt;WidgetCB&gt;() {
-     *     public void query(WidgetCB unionCB) {
-     *         unionCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">unionAll</span>(<span style="color: #553000">unionCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">unionCB</span>.query().set...
      * });
      * </pre>
-     * @param unionQuery The query of 'union all'. (NotNull)
+     * @param unionCBLambda The callback for query of 'union all'. (NotNull)
      */
-    public void unionAll(UnionQuery<WidgetCB> unionQuery) {
+    public void unionAll(UnionQuery<WidgetCB> unionCBLambda) {
         final WidgetCB cb = new WidgetCB(); cb.xsetupForUnion(this); xsyncUQ(cb);
-        try { lock(); unionQuery.query(cb); } finally { unlock(); } xsaveUCB(cb);
+        try { lock(); unionCBLambda.query(cb); } finally { unlock(); } xsaveUCB(cb);
         final WidgetCQ cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
 
@@ -260,29 +244,28 @@ public class BsWidgetCB extends AbstractConditionBean {
     protected HpSpecification _specification;
 
     /**
-     * Prepare for SpecifyColumn, (Specify)DerivedReferrer. <br />
+     * Prepare for SpecifyColumn, (Specify)DerivedReferrer. <br>
      * This method should be called after SetupSelect.
      * <pre>
-     * cb.setupSelect_MemberStatus(); <span style="color: #3F7E5E">// should be called before specify()</span>
-     * cb.specify().columnMemberName();
-     * cb.specify().specifyMemberStatus().columnMemberStatusName();
-     * cb.specify().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchaseDatetime();
-     *         subCB.query().set...
-     *     }
-     * }, aliasName);
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus(); <span style="color: #3F7E5E">// should be called before specify()</span>
+     *     <span style="color: #553000">cb</span>.specify().columnMemberName();
+     *     <span style="color: #553000">cb</span>.specify().specifyMemberStatus().columnMemberStatusName();
+     *     <span style="color: #553000">cb</span>.specify().derivedPurchaseList().max(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *         <span style="color: #553000">purchaseCB</span>.specify().columnPurchaseDatetime();
+     *         <span style="color: #553000">purchaseCB</span>.query().set...
+     *     }, aliasName);
+     * }).alwaysPresent(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ...
+     * });
      * </pre>
      * @return The instance of specification. (NotNull)
      */
     public HpSpecification specify() {
         assertSpecifyPurpose();
         if (_specification == null) { _specification = new HpSpecification(this
-            , new HpSpQyCall<WidgetCQ>() {
-                public boolean has() { return true; }
-                public WidgetCQ qy() { return getConditionQuery(); }
-            }
-            , _purpose, getDBMetaProvider()); }
+            , xcreateSpQyCall(() -> true, () -> xdfgetConditionQuery())
+            , _purpose, getDBMetaProvider(), xcSDRFnFc()); }
         return _specification;
     }
 
@@ -290,54 +273,55 @@ public class BsWidgetCB extends AbstractConditionBean {
         return specify();
     }
 
-    public boolean hasSpecifiedColumn() {
-        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
+    public boolean hasSpecifiedLocalColumn() {
+        return _specification != null && _specification.hasSpecifiedColumn();
     }
 
     public static class HpSpecification extends HpAbstractSpecification<WidgetCQ> {
         public HpSpecification(ConditionBean baseCB, HpSpQyCall<WidgetCQ> qyCall
-                             , HpCBPurpose purpose, DBMetaProvider dbmetaProvider)
-        { super(baseCB, qyCall, purpose, dbmetaProvider); }
+                             , HpCBPurpose purpose, DBMetaProvider dbmetaProvider
+                             , HpSDRFunctionFactory sdrFuncFactory)
+        { super(baseCB, qyCall, purpose, dbmetaProvider, sdrFuncFactory); }
         /**
          * ID: {PK, ID, NotNull, INTEGER(10)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnId() { return doColumn("ID"); }
+        public SpecifiedColumn columnId() { return doColumn("ID"); }
         /**
          * NAME: {NotNull, VARCHAR(50)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnName() { return doColumn("NAME"); }
+        public SpecifiedColumn columnName() { return doColumn("NAME"); }
         /**
          * PRICE: {NotNull, INTEGER(10)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnPrice() { return doColumn("PRICE"); }
+        public SpecifiedColumn columnPrice() { return doColumn("PRICE"); }
         /**
          * REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnRegisterDatetime() { return doColumn("REGISTER_DATETIME"); }
+        public SpecifiedColumn columnRegisterDatetime() { return doColumn("REGISTER_DATETIME"); }
         /**
          * REGISTER_USER: {NotNull, VARCHAR(200)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnRegisterUser() { return doColumn("REGISTER_USER"); }
+        public SpecifiedColumn columnRegisterUser() { return doColumn("REGISTER_USER"); }
         /**
          * UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnUpdateDatetime() { return doColumn("UPDATE_DATETIME"); }
+        public SpecifiedColumn columnUpdateDatetime() { return doColumn("UPDATE_DATETIME"); }
         /**
          * UPDATE_USER: {NotNull, VARCHAR(200)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnUpdateUser() { return doColumn("UPDATE_USER"); }
+        public SpecifiedColumn columnUpdateUser() { return doColumn("UPDATE_USER"); }
         /**
          * VERSION_NO: {NotNull, BIGINT(19)}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn columnVersionNo() { return doColumn("VERSION_NO"); }
+        public SpecifiedColumn columnVersionNo() { return doColumn("VERSION_NO"); }
         public void everyColumn() { doEveryColumn(); }
         public void exceptRecordMetaColumn() { doExceptRecordMetaColumn(); }
         @Override
@@ -352,52 +336,16 @@ public class BsWidgetCB extends AbstractConditionBean {
          */
         public HpSDRFunction<WidgetCB, WidgetCQ> myselfDerived() {
             assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return new HpSDRFunction<WidgetCB, WidgetCQ>(_baseCB, _qyCall.qy(), new HpSDRSetupper<WidgetCB, WidgetCQ>() {
-                public void setup(String fn, SubQuery<WidgetCB> sq, WidgetCQ cq, String al, DerivedReferrerOption op) {
-                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider);
+            return cHSDRF(_baseCB, _qyCall.qy(), (String fn, SubQuery<WidgetCB> sq, WidgetCQ cq, String al, DerivedReferrerOption op)
+                    -> cq.xsmyselfDerive(fn, sq, al, op), _dbmetaProvider);
         }
-    }
-
-    // [DBFlute-0.9.5.3]
-    // ===================================================================================
-    //                                                                        Column Query
-    //                                                                        ============
-    /**
-     * Set up column-query. {column1 = column2}
-     * <pre>
-     * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;WidgetCB&gt;() {
-     *     public void query(WidgetCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
-     *     }
-     * }).lessThan(new SpecifyQuery&lt;WidgetCB&gt;() {
-     *     public void query(WidgetCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
-     *     }
-     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
-     * </pre>
-     * @param leftSpecifyQuery The specify-query for left column. (NotNull)
-     * @return The object for setting up operand and right column. (NotNull)
-     */
-    public HpColQyOperand<WidgetCB> columnQuery(final SpecifyQuery<WidgetCB> leftSpecifyQuery) {
-        return xcreateColQyOperand(new HpColQyHandler<WidgetCB>() {
-            public HpCalculator handle(SpecifyQuery<WidgetCB> rightSp, String operand) {
-                return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), leftSpecifyQuery, rightSp, operand);
-            }
-        });
-    }
-
-    protected WidgetCB xcreateColumnQueryCB() {
-        WidgetCB cb = new WidgetCB();
-        cb.xsetupForColumnQuery((WidgetCB)this);
-        return cb;
     }
 
     // ===================================================================================
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
-     * Welcome to the Dream Cruise for condition-bean deep world. <br />
+     * Welcome to the Dream Cruise for condition-bean deep world. <br>
      * This is very specialty so you can get the frontier spirit. Bon voyage!
      * @return The condition-bean for dream cruise, which is linked to main condition-bean.
      */
@@ -411,49 +359,72 @@ public class BsWidgetCB extends AbstractConditionBean {
         return dreamCruiseCB();
     }
 
+    // [DBFlute-0.9.5.3]
+    // ===================================================================================
+    //                                                                        Column Query
+    //                                                                        ============
+    /**
+     * Set up column-query. {column1 = column2}
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
+     * cb.<span style="color: #CC4747">columnQuery</span>(<span style="color: #553000">colCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">colCB</span>.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     * }).lessThan(<span style="color: #553000">colCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">colCB</span>.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param colCBLambda The callback for specify-query of left column. (NotNull)
+     * @return The object for setting up operand and right column. (NotNull)
+     */
+    public HpColQyOperand<WidgetCB> columnQuery(final SpecifyQuery<WidgetCB> colCBLambda) {
+        return xcreateColQyOperand((rightSp, operand) -> {
+            return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), colCBLambda, rightSp, operand);
+        });
+    }
+
+    protected WidgetCB xcreateColumnQueryCB() {
+        WidgetCB cb = new WidgetCB();
+        cb.xsetupForColumnQuery((WidgetCB)this);
+        return cb;
+    }
+
     // [DBFlute-0.9.6.3]
     // ===================================================================================
     //                                                                       OrScope Query
     //                                                                       =============
     /**
-     * Set up the query for or-scope. <br />
+     * Set up the query for or-scope. <br>
      * (Same-column-and-same-condition-key conditions are allowed in or-scope)
      * <pre>
      * <span style="color: #3F7E5E">// where (FOO = '...' or BAR = '...')</span>
-     * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;WidgetCB&gt;() {
-     *     public void query(WidgetCB orCB) {
-     *         orCB.query().setFOO_Equal...
-     *         orCB.query().setBAR_Equal...
-     *     }
+     * cb.<span style="color: #CC4747">orScopeQuery</span>(<span style="color: #553000">orCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">orCB</span>.query().setFoo...
+     *     <span style="color: #553000">orCB</span>.query().setBar...
      * });
      * </pre>
-     * @param orQuery The query for or-condition. (NotNull)
+     * @param orCBLambda The callback for query of or-condition. (NotNull)
      */
-    public void orScopeQuery(OrQuery<WidgetCB> orQuery) {
-        xorSQ((WidgetCB)this, orQuery);
+    public void orScopeQuery(OrQuery<WidgetCB> orCBLambda) {
+        xorSQ((WidgetCB)this, orCBLambda);
     }
 
     /**
-     * Set up the and-part of or-scope. <br />
+     * Set up the and-part of or-scope. <br>
      * (However nested or-scope query and as-or-split of like-search in and-part are unsupported)
      * <pre>
      * <span style="color: #3F7E5E">// where (FOO = '...' or (BAR = '...' and QUX = '...'))</span>
-     * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;WidgetCB&gt;() {
-     *     public void query(WidgetCB orCB) {
-     *         orCB.query().setFOO_Equal...
-     *         orCB.<span style="color: #DD4747">orScopeQueryAndPart</span>(new AndQuery&lt;WidgetCB&gt;() {
-     *             public void query(WidgetCB andCB) {
-     *                 andCB.query().setBar_...
-     *                 andCB.query().setQux_...
-     *             }
-     *         });
-     *     }
+     * cb.<span style="color: #994747">orScopeQuery</span>(<span style="color: #553000">orCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">orCB</span>.query().setFoo...
+     *     <span style="color: #553000">orCB</span>.<span style="color: #CC4747">orScopeQueryAndPart</span>(<span style="color: #553000">andCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *         <span style="color: #553000">andCB</span>.query().setBar...
+     *         <span style="color: #553000">andCB</span>.query().setQux...
+     *     });
      * });
      * </pre>
-     * @param andQuery The query for and-condition. (NotNull)
+     * @param andCBLambda The callback for query of and-condition. (NotNull)
      */
-    public void orScopeQueryAndPart(AndQuery<WidgetCB> andQuery) {
-        xorSQAP((WidgetCB)this, andQuery);
+    public void orScopeQueryAndPart(AndQuery<WidgetCB> andCBLambda) {
+        xorSQAP((WidgetCB)this, andCBLambda);
     }
 
     // ===================================================================================
@@ -463,9 +434,13 @@ public class BsWidgetCB extends AbstractConditionBean {
     protected SqlAnalyzerFactory getSqlAnalyzerFactory()
     { return new ImplementedInvokerAssistant().assistSqlAnalyzerFactory(); }
     @Override
-    protected String getLogDateFormat() { return DBFluteConfig.getInstance().getLogDateFormat(); }
+    protected String getConfiguredLogDatePattern() { return DBFluteConfig.getInstance().getLogDatePattern(); }
     @Override
-    protected String getLogTimestampFormat() { return DBFluteConfig.getInstance().getLogTimestampFormat(); }
+    protected String getConfiguredLogTimestampPattern() { return DBFluteConfig.getInstance().getLogTimestampPattern(); }
+    @Override
+    protected String getConfiguredLogTimePattern() { return DBFluteConfig.getInstance().getLogTimePattern(); }
+    @Override
+    protected BoundDateDisplayTimeZoneProvider getConfiguredLogTimeZoneProvider() { return DBFluteConfig.getInstance().getLogTimeZoneProvider(); }
 
     // ===================================================================================
     //                                                                       Meta Handling
@@ -485,18 +460,15 @@ public class BsWidgetCB extends AbstractConditionBean {
         } else {
             cb = new WidgetCB();
         }
-        specify().xsetSyncQyCall(new HpSpQyCall<WidgetCQ>() {
-            public boolean has() { return true; }
-            public WidgetCQ qy() { return cb.query(); }
-        });
+        specify().xsetSyncQyCall(xcreateSpQyCall(() -> true, () -> cb.query()));
     }
 
     // ===================================================================================
     //                                                                            Internal
     //                                                                            ========
     // very internal (for suppressing warn about 'Not Use Import')
-    protected String getConditionBeanClassNameInternally() { return WidgetCB.class.getName(); }
-    protected String getConditionQueryClassNameInternally() { return WidgetCQ.class.getName(); }
-    protected String getSubQueryClassNameInternally() { return SubQuery.class.getName(); }
-    protected String getConditionOptionClassNameInternally() { return ConditionOption.class.getName(); }
+    protected String xgetConditionBeanClassNameInternally() { return WidgetCB.class.getName(); }
+    protected String xgetConditionQueryClassNameInternally() { return WidgetCQ.class.getName(); }
+    protected String xgetSubQueryClassNameInternally() { return SubQuery.class.getName(); }
+    protected String xgetConditionOptionClassNameInternally() { return ConditionOption.class.getName(); }
 }

@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.lang.reflect.Method;
 
-import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.exception.DBMetaNotFoundException;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfAssertUtil;
+import org.dbflute.Entity;
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.exception.DBMetaNotFoundException;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfAssertUtil;
 
 /**
  * The handler of the instance of DB meta.
@@ -44,7 +44,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
     }
 
     /**
-     * Get the unmodifiable map of DB meta.
+     * Get the unmodifiable map of DB meta. map:{tableDbName = DBMeta}
      * @return The unmodifiable map that contains all instances of DB meta. (NotNull, NotEmpty)
      */
     public static Map<String, DBMeta> getUnmodifiableDBMetaMap() {
@@ -108,7 +108,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
      * Find DB meta by table flexible name. (accept quoted name and schema prefix)
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
     public static DBMeta findDBMeta(String tableFlexibleName) {
         DBMeta dbmeta = byTableFlexibleName(tableFlexibleName);
@@ -123,7 +123,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
      * Find DB meta by entity type.
      * @param entityType The entity type of table, which should implement the {@link Entity} interface. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
     public static DBMeta findDBMeta(Class<?> entityType) {
         DBMeta dbmeta = byEntityType(entityType);
@@ -261,7 +261,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
             }
             if (Entity.class.isAssignableFrom(entityType)) { // required
                 Entity entity = newEntity(entityType);
-                dbmeta = getCachedDBMeta(entity.getTableDbName());
+                dbmeta = getCachedDBMeta(entity.asTableDbName());
             }
             if (dbmeta == null) {
                 return null;

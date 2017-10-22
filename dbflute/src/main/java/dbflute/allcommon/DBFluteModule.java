@@ -3,10 +3,10 @@ package dbflute.allcommon;
 import javax.sql.DataSource;
 
 import com.google.inject.AbstractModule;
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.bhv.BehaviorSelector;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.hook.CommonColumnAutoSetupper;
 import dbflute.exbhv.*;
 
 /**
@@ -14,7 +14,7 @@ import dbflute.exbhv.*;
  */
 public class DBFluteModule extends AbstractModule {
 
-    protected DataSource dataSource;
+    protected final DataSource dataSource;
 
     public DBFluteModule(DataSource dataSource) {
         if (dataSource == null) {

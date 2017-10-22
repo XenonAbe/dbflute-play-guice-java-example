@@ -1,7 +1,7 @@
 package dbflute.cbean.cq;
 
-import org.seasar.dbflute.cbean.ConditionQuery;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.cbean.ConditionQuery;
+import org.dbflute.cbean.sqlclause.SqlClause;
 import dbflute.cbean.cq.bs.BsWidgetCQ;
 
 /**

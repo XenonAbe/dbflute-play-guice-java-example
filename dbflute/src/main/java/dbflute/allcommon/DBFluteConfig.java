@@ -6,30 +6,28 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.QLog;
-import org.seasar.dbflute.XLog;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
-import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.name.SqlNameFilter;
-import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
-import org.seasar.dbflute.jdbc.DataSourceHandler;
-import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
-import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
-import org.seasar.dbflute.jdbc.SQLExceptionDigger;
-import org.seasar.dbflute.jdbc.StatementConfig;
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleAgent;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleArrayType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleStructType;
-import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
-import org.seasar.dbflute.util.DfReflectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
+import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.dbmeta.name.SqlNameFilter;
+import org.dbflute.dbway.DBDef;
+import org.dbflute.exception.IllegalDBFluteConfigAccessException;
+import org.dbflute.jdbc.DataSourceHandler;
+import org.dbflute.jdbc.NotClosingConnectionWrapper;
+import org.dbflute.jdbc.PhysicalConnectionDigger;
+import org.dbflute.jdbc.SQLExceptionDigger;
+import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.jdbc.ValueType;
+import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.system.QLog;
+import org.dbflute.system.XLog;
+import org.dbflute.twowaysql.DisplaySqlBuilder;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
+import org.dbflute.util.DfReflectionUtil;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -39,8 +37,8 @@ public class DBFluteConfig {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DBFluteConfig.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DBFluteConfig.class);
 
     /** Singleton instance. */
     private static final DBFluteConfig _instance = new DBFluteConfig();
@@ -56,19 +54,25 @@ public class DBFluteConfig {
     protected boolean _pagingCountLeastJoin = true;
     protected boolean _innerJoinAutoDetect = true;
     protected boolean _thatsBadTimingDetect = true;
-    protected boolean _nullOrEmptyQueryAllowed = true;
-    protected boolean _emptyStringQueryAllowed;
-    protected boolean _emptyStringParameterAllowed;
-    protected boolean _overridingQueryAllowed = true;
-    protected boolean _nonSpecifiedColumnAccessAllowed = true;
+    protected boolean _nullOrEmptyQueryAllowed = false;
+    protected boolean _emptyStringQueryAllowed = false;
+    protected boolean _emptyStringParameterAllowed = false;
+    protected boolean _overridingQueryAllowed = false;
+    protected boolean _nonSpecifiedColumnAccessAllowed = false;
+    protected boolean _specifyColumnRequired = false;
+    protected boolean _columnNullObjectAllowed = false;
+    protected boolean _columnNullObjectGearedToSpecify = false;
+    protected boolean _datetimePrecisionTruncationOfCondition = false;
     protected boolean _disableSelectIndex;
     protected boolean _queryUpdateCountPreCheck = false;
 
     // logging
     protected boolean _queryLogLevelInfo;
     protected boolean _executeStatusLogLevelInfo;
-    protected String _logDateFormat;
-    protected String _logTimestampFormat;
+    protected String _logDatePattern;
+    protected String _logTimestampPattern;
+    protected String _logTimePattern;
+    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
 
     // environment
     protected StatementConfig _defaultStatementConfig;
@@ -79,8 +83,8 @@ public class DBFluteConfig {
     protected DataSourceHandler _dataSourceHandler;
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
-    protected String _outsideSqlPackage;
-    protected boolean _useSqlLogRegistry = false;
+    protected String _outsideSqlPackage = null;
+    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
 
     // extension
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
@@ -110,14 +114,6 @@ public class DBFluteConfig {
     private DBFluteConfig() { // adjusts default settings
         _physicalConnectionDigger = new ImplementedPhysicalConnectionDigger();
         _sqlExceptionDigger = new ImplementedSQLExceptionDigger();
-
-        if (isCurrentDBDef(DBDef.Oracle)) {
-            // date formatting has two points:
-            //   o the DATE type of Oracle has seconds  
-            //   o it uses a date literal of Oracle
-            _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
-            _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
-        }
     }
 
     // ===================================================================================
@@ -196,7 +192,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Set whether null-or-empty query is allowed or not. <br />
+     * Set whether null-or-empty query is allowed or not. <br>
      * This configuration is only for ConditionBean.
      * @param nullOrEmptyQueryAllowed The determination, true or false.
      */
@@ -213,7 +209,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Set whether an empty string for query is allowed or not. <br />
+     * Set whether an empty string for query is allowed or not. <br>
      * This configuration is only for ConditionBean.
      * @param emptyStringQueryAllowed The determination, true or false.
      */
@@ -230,7 +226,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Set whether an empty string for parameter is allowed or not. <br />
+     * Set whether an empty string for parameter is allowed or not. <br>
      * This configuration is only for ParameterBean.
      * @param emptyStringParameterAllowed The determination, true or false.
      */
@@ -247,7 +243,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Set whether overriding query is allowed or not. <br />
+     * Set whether overriding query is allowed or not. <br>
      * This configuration is only for ConditionBean.
      * @param overridingQueryAllowed The determination, true or false.
      */
@@ -267,7 +263,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Set whether non-specified column access is allowed or not. <br />
+     * Set whether non-specified column access is allowed or not. <br>
      * This configuration is only for ConditionBean.
      * @param nonSpecifiedColumnAccessAllowed The determination, true or false.
      */
@@ -277,6 +273,78 @@ public class DBFluteConfig {
             _log.info("...Setting nonSpecifiedColumnAccessAllowed: " + nonSpecifiedColumnAccessAllowed);
         }
         _nonSpecifiedColumnAccessAllowed = nonSpecifiedColumnAccessAllowed;
+    }
+
+    // ===================================================================================
+    //                                                              SpecifyColumn Required
+    //                                                              ======================
+    public boolean isSpecifyColumnRequired() {
+        return _specifyColumnRequired;
+    }
+
+    public void setSpecifyColumnRequired(boolean specifyColumnRequired) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting specifyColumnRequired: " + specifyColumnRequired);
+        }
+        _specifyColumnRequired = specifyColumnRequired;
+    }
+
+    // ===================================================================================
+    //                                                                  Column Null Object
+    //                                                                  ==================
+    public boolean isColumnNullObjectAllowed() {
+        return _columnNullObjectAllowed;
+    }
+
+    /**
+     * Set whether column null object is allowed or not. <br>
+     * This configuration is only for ConditionBean.
+     * @param columnNullObjectAllowed The determination, true or false.
+     */
+    public void setColumnNullObjectAllowed(boolean columnNullObjectAllowed) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting columnNullObjectAllowed: " + columnNullObjectAllowed);
+        }
+        _columnNullObjectAllowed = columnNullObjectAllowed;
+    }
+
+    public boolean isColumnNullObjectGearedToSpecify() {
+        return _columnNullObjectGearedToSpecify;
+    }
+
+    /**
+     * Set whether column null object is geared to specify or not. <br>
+     * This configuration is only for ConditionBean.
+     * @param columnNullObjectGearedToSpecify The determination, true or false.
+     */
+    public void setColumnNullObjectGearedToSpecify(boolean columnNullObjectGearedToSpecify) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting columnNullObjectGearedToSpecify: " + columnNullObjectGearedToSpecify);
+        }
+        _columnNullObjectGearedToSpecify = columnNullObjectGearedToSpecify;
+    }
+
+    // ===================================================================================
+    //                                                                 Date-time Precision
+    //                                                                 ===================
+    public boolean isDatetimePrecisionTruncationOfCondition() {
+        return _datetimePrecisionTruncationOfCondition;
+    }
+
+    /**
+     * Set whether it truncates date-time precision of condition value or not. <br>
+     * This configuration is only for ConditionBean.
+     * @param datetimePrecisionTruncationOfCondition The determination, true or false.
+     */
+    public void setDatetimePrecisionTruncationOfCondition(boolean datetimePrecisionTruncationOfCondition) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting datetimePrecisionTruncationOfCondition: " + datetimePrecisionTruncationOfCondition);
+        }
+        _datetimePrecisionTruncationOfCondition = datetimePrecisionTruncationOfCondition;
     }
 
     // ===================================================================================
@@ -338,28 +406,52 @@ public class DBFluteConfig {
     // ===================================================================================
     //                                                                          Log Format
     //                                                                          ==========
-    public String getLogDateFormat() {
-        return _logDateFormat;
+    public String getLogDatePattern() {
+        return _logDatePattern;
     }
 
-    public void setLogDateFormat(String logDateFormat) {
+    public void setLogDatePattern(String logDatePattern) {
         assertUnlocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting logDateFormat: " + logDateFormat);
+            _log.info("...Setting logDatePattern: " + logDatePattern);
         }
-        _logDateFormat = logDateFormat;
+        _logDatePattern = logDatePattern;
     }
 
-    public String getLogTimestampFormat() {
-        return _logTimestampFormat;
+    public String getLogTimestampPattern() {
+        return _logTimestampPattern;
     }
 
-    public void setLogTimestampFormat(String logTimestampFormat) {
+    public void setLogTimestampPattern(String logTimestampPattern) {
         assertUnlocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting logTimestampFormat: " + logTimestampFormat);
+            _log.info("...Setting logTimestampPattern: " + logTimestampPattern);
         }
-        _logTimestampFormat = logTimestampFormat;
+        _logTimestampPattern = logTimestampPattern;
+    }
+
+    public String getLogTimePattern() {
+        return _logTimePattern;
+    }
+
+    public void setLogTimePattern(String logTimePattern) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting logTimePattern: " + logTimePattern);
+        }
+        _logTimePattern = logTimePattern;
+    }
+
+    public BoundDateDisplayTimeZoneProvider getLogTimeZoneProvider() {
+        return _logTimeZoneProvider;
+    }
+
+    public void setLogTimeZoneProvider(BoundDateDisplayTimeZoneProvider logTimeZoneProvider) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting logTimeZoneProvider: " + logTimeZoneProvider);
+        }
+        _logTimeZoneProvider = logTimeZoneProvider;
     }
 
     // ===================================================================================
@@ -527,20 +619,20 @@ public class DBFluteConfig {
         _outsideSqlPackage = outsideSqlPackage;
     }
 
-    // [DBFlute-0.8.2]
+    // [DBFlute-1.1.0]
     // ===================================================================================
-    //                                                                    SQL Log Registry
-    //                                                                    ================
-    public boolean isUseSqlLogRegistry() {
-        return _useSqlLogRegistry;
+    //                                                               Mapping Date TimeZone
+    //                                                               =====================
+    public MappingDateTimeZoneProvider getMappingDateTimeZoneProvider() {
+        return _mappingDateTimeZoneProvider;
     }
 
-    public void setUseSqlLogRegistry(boolean useSqlLogRegistry) {
+    public void setMappingDateTimeZoneProvider(MappingDateTimeZoneProvider mappingDateTimeZoneProvider) {
         assertUnlocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
+            _log.info("...Setting mappingDateTimeZoneProvider: " + mappingDateTimeZoneProvider);
         }
-        _useSqlLogRegistry = useSqlLogRegistry;
+        _mappingDateTimeZoneProvider = mappingDateTimeZoneProvider;
     }
 
     // [DBFlute-0.9.6.4]
@@ -599,7 +691,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Set the SQL name filter for table. <br />
+     * Set the SQL name filter for table. <br>
      * This setting should be called before container's initialization.
      * (its exact meaning is: before class loading of DBMeta for table)
      * @param tableSqlNameFilter The SQL name filter for table. (NullAllowed)
@@ -667,7 +759,7 @@ public class DBFluteConfig {
     //                                                                          Value Type
     //                                                                          ==========
     /**
-     * Register the basic value type. <br />
+     * Register the basic value type. <br>
      * This setting is shared per DBMS in the same class loader. 
      * @param keyType The type as key. (NotNull)
      * @param valueType The basic value type. (NotNull)
@@ -689,7 +781,7 @@ public class DBFluteConfig {
     }
 
     /**
-     * Register the plug-in value type. <br />
+     * Register the plug-in value type. <br>
      * This setting is shared per DBMS in the same class loader.
      * @param keyName The name as key. (NotNull)
      * @param valueType The plug-in value type. (NotNull)
@@ -741,8 +833,7 @@ public class DBFluteConfig {
         if (!isLocked()) {
             return;
         }
-        String msg = "The configuration of DBFlute is locked.";
-        throw new IllegalDBFluteConfigAccessException(msg);
+        throw new IllegalDBFluteConfigAccessException("The configuration of DBFlute is locked.");
     }
 
     // ===================================================================================
@@ -760,106 +851,12 @@ public class DBFluteConfig {
     //                                                                   Implemented Class
     //                                                                   =================
     // -----------------------------------------------------
-    //                                                Spring
-    //                                                ------
-    public static class SpringTransactionalDataSourceHandler implements DataSourceHandler {
-
-        public Connection getConnection(DataSource ds) throws SQLException {
-            final Connection conn = getConnectionFromUtils(ds);
-            if (isConnectionTransactional(conn, ds)) {
-                return new NotClosingConnectionWrapper(conn);
-            } else {
-                return conn;
-            }
-        }
-
-        public Connection getConnectionFromUtils(DataSource ds) {
-            throw new IllegalStateException("This method is only for Spring Framework.");
-        }
-
-        public boolean isConnectionTransactional(Connection conn, DataSource ds) {
-            throw new IllegalStateException("This method is only for Spring Framework.");
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                                Oracle
-    //                                                ------
-    public static class ImplementedOracleAgent implements OracleAgent {
-
-        public Object toOracleDate(Timestamp timestamp) {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public Object toStandardArray(Object oracleArray) throws SQLException {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public boolean isOracleArray(Object obj) {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public boolean isOracleStruct(Object obj) {
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-        }
-
-        public PhysicalConnectionDigger getPhysicalConnectionDigger() {
-            return DBFluteConfig.getInstance().getPhysicalConnectionDigger();
-        }
-    }
-
-    public static class ImplementedOracleDateType extends OracleDateType {
-
-        @Override
-        protected OracleAgent createOracleAgent() {
-            return new ImplementedOracleAgent();
-        }
-    }
-
-    public static class ImplementedOracleArrayType extends OracleArrayType {
-
-        public ImplementedOracleArrayType(String arrayTypeName, Class<?> elementType) {
-            super(arrayTypeName, elementType);
-        }
-
-        @Override
-        protected OracleAgent createOracleAgent() {
-            return new ImplementedOracleAgent();
-        }
-    }
-
-    public static class ImplementedOracleStructType extends OracleStructType {
-
-        public ImplementedOracleStructType(String structTypeName, Class<?> entityType) {
-            super(structTypeName, entityType);
-        }
-
-        @Override
-        protected OracleAgent createOracleAgent() {
-            return new ImplementedOracleAgent();
-        }
-    }
-
-    // -----------------------------------------------------
     //                                   Physical Connection
     //                                   -------------------
     public static class ImplementedPhysicalConnectionDigger implements PhysicalConnectionDigger {
 
         public Connection digUp(Connection conn) throws SQLException {
             Connection digged = unwrap(conn);
-            digged = resolveS2DBCP(digged);
             digged = resolveCommonsDBCP(digged);
             return digged;
         }
@@ -868,10 +865,6 @@ public class DBFluteConfig {
             if (conn instanceof NotClosingConnectionWrapper) {
                 return ((NotClosingConnectionWrapper)conn).getActualConnection();
             }
-            return conn;
-        }
-
-        protected Connection resolveS2DBCP(Connection conn) {
             return conn;
         }
 
@@ -898,18 +891,10 @@ public class DBFluteConfig {
     public static class ImplementedSQLExceptionDigger implements SQLExceptionDigger {
 
         public SQLException digUp(Throwable cause) {
-            SQLException found = resolveS2DBCP(cause);
-            if (found != null) {
-                return found;
+            SQLException defaultFound = resolveDefault(cause);
+            if (defaultFound != null) {
+                return defaultFound;
             }
-            found = resolveDefault(cause);
-            if (found != null) {
-                return found;
-            }
-            return null;
-        }
-
-        protected SQLException resolveS2DBCP(Throwable cause) {
             return null;
         }
 
@@ -921,4 +906,13 @@ public class DBFluteConfig {
             return null;
         }
     }
+
+    // ===================================================================================
+    //                                                                       Very Internal
+    //                                                                       =============
+    // very internal (for suppressing warn about 'Not Use Import')
+    protected String xTms() { return Timestamp.class.getName(); }
+    protected String xDSc() { return DataSource.class.getName(); }
+    protected String xSQLEx() { return SQLException.class.getName(); }
+    protected String xDSqB() { return DisplaySqlBuilder.class.getName(); }
 }

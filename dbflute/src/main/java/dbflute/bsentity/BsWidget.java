@@ -3,51 +3,51 @@ package dbflute.bsentity;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.AbstractEntity;
-import org.seasar.dbflute.dbmeta.accessory.DomainEntity;
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.AbstractEntity;
+import org.dbflute.dbmeta.accessory.DomainEntity;
 import dbflute.allcommon.EntityDefinedCommonColumn;
 import dbflute.allcommon.DBMetaInstanceHandler;
 import dbflute.exentity.*;
 
 /**
- * The entity of WIDGET as TABLE. <br />
+ * The entity of WIDGET as TABLE. <br>
  * <pre>
  * [primary-key]
  *     ID
- * 
+ *
  * [column]
  *     ID, NAME, PRICE, REGISTER_DATETIME, REGISTER_USER, UPDATE_DATETIME, UPDATE_USER, VERSION_NO
- * 
+ *
  * [sequence]
  *     
- * 
+ *
  * [identity]
  *     ID
- * 
+ *
  * [version-no]
  *     VERSION_NO
- * 
+ *
  * [foreign table]
  *     
- * 
+ *
  * [referrer table]
  *     
- * 
+ *
  * [foreign property]
  *     
- * 
+ *
  * [referrer property]
  *     
- * 
+ *
  * [get/set template]
  * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
  * Integer id = entity.getId();
  * String name = entity.getName();
  * Integer price = entity.getPrice();
- * java.sql.Timestamp registerDatetime = entity.getRegisterDatetime();
+ * java.time.LocalDateTime registerDatetime = entity.getRegisterDatetime();
  * String registerUser = entity.getRegisterUser();
- * java.sql.Timestamp updateDatetime = entity.getUpdateDatetime();
+ * java.time.LocalDateTime updateDatetime = entity.getUpdateDatetime();
  * String updateUser = entity.getUpdateUser();
  * Long versionNo = entity.getVersionNo();
  * entity.setId(id);
@@ -67,15 +67,12 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    // -----------------------------------------------------
-    //                                                Column
-    //                                                ------
     /** ID: {PK, ID, NotNull, INTEGER(10)} */
     protected Integer _id;
 
@@ -86,13 +83,13 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     protected Integer _price;
 
     /** REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)} */
-    protected java.sql.Timestamp _registerDatetime;
+    protected java.time.LocalDateTime _registerDatetime;
 
     /** REGISTER_USER: {NotNull, VARCHAR(200)} */
     protected String _registerUser;
 
     /** UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)} */
-    protected java.sql.Timestamp _updateDatetime;
+    protected java.time.LocalDateTime _updateDatetime;
 
     /** UPDATE_USER: {NotNull, VARCHAR(200)} */
     protected String _updateUser;
@@ -100,47 +97,25 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     /** VERSION_NO: {NotNull, BIGINT(19)} */
     protected Long _versionNo;
 
-    // -----------------------------------------------------
-    //                                              Internal
-    //                                              --------
-    /** Is common column auto set up effective? */
-    protected boolean __canCommonColumnAutoSetup = true;
-
     // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
-    /**
-     * {@inheritDoc}
-     */
-    public String getTableDbName() {
+    //                                                                             DB Meta
+    //                                                                             =======
+    /** {@inheritDoc} */
+    public DBMeta asDBMeta() {
+        return DBMetaInstanceHandler.findDBMeta(asTableDbName());
+    }
+
+    /** {@inheritDoc} */
+    public String asTableDbName() {
         return "WIDGET";
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getTablePropertyName() { // according to Java Beans rule
-        return "widget";
-    }
-
     // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    /**
-     * {@inheritDoc}
-     */
-    public DBMeta getDBMeta() {
-        return DBMetaInstanceHandler.findDBMeta(getTableDbName());
-    }
-
-    // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
+    //                                                                        Key Handling
+    //                                                                        ============
+    /** {@inheritDoc} */
     public boolean hasPrimaryKeyValue() {
-        if (getId() == null) { return false; }
+        if (_id == null) { return false; }
         return true;
     }
 
@@ -150,32 +125,8 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     // ===================================================================================
     //                                                                   Referrer Property
     //                                                                   =================
-    protected <ELEMENT> List<ELEMENT> newReferrerList() {
+    protected <ELEMENT> List<ELEMENT> newReferrerList() { // overriding to import
         return new ArrayList<ELEMENT>();
-    }
-
-    // ===================================================================================
-    //                                                                       Common Column
-    //                                                                       =============
-    /**
-     * {@inheritDoc}
-     */
-    public void enableCommonColumnAutoSetup() {
-        __canCommonColumnAutoSetup = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void disableCommonColumnAutoSetup() {
-        __canCommonColumnAutoSetup = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean canCommonColumnAutoSetup() {
-        return __canCommonColumnAutoSetup;
     }
 
     // ===================================================================================
@@ -195,7 +146,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     @Override
     protected int doHashCode(int initial) {
         int hs = initial;
-        hs = xCH(hs, getTableDbName());
+        hs = xCH(hs, asTableDbName());
         hs = xCH(hs, _id);
         return hs;
     }
@@ -237,7 +188,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * [get] ID: {PK, ID, NotNull, INTEGER(10)} <br />
+     * [get] ID: {PK, ID, NotNull, INTEGER(10)} <br>
      * @return The value of the column 'ID'. (basically NotNull if selected: for the constraint)
      */
     public Integer getId() {
@@ -246,7 +197,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [set] ID: {PK, ID, NotNull, INTEGER(10)} <br />
+     * [set] ID: {PK, ID, NotNull, INTEGER(10)} <br>
      * @param id The value of the column 'ID'. (basically NotNull if update: for the constraint)
      */
     public void setId(Integer id) {
@@ -255,7 +206,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [get] NAME: {NotNull, VARCHAR(50)} <br />
+     * [get] NAME: {NotNull, VARCHAR(50)} <br>
      * @return The value of the column 'NAME'. (basically NotNull if selected: for the constraint)
      */
     public String getName() {
@@ -264,7 +215,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [set] NAME: {NotNull, VARCHAR(50)} <br />
+     * [set] NAME: {NotNull, VARCHAR(50)} <br>
      * @param name The value of the column 'NAME'. (basically NotNull if update: for the constraint)
      */
     public void setName(String name) {
@@ -273,7 +224,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [get] PRICE: {NotNull, INTEGER(10)} <br />
+     * [get] PRICE: {NotNull, INTEGER(10)} <br>
      * @return The value of the column 'PRICE'. (basically NotNull if selected: for the constraint)
      */
     public Integer getPrice() {
@@ -282,7 +233,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [set] PRICE: {NotNull, INTEGER(10)} <br />
+     * [set] PRICE: {NotNull, INTEGER(10)} <br>
      * @param price The value of the column 'PRICE'. (basically NotNull if update: for the constraint)
      */
     public void setPrice(Integer price) {
@@ -291,25 +242,25 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [get] REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br />
+     * [get] REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br>
      * @return The value of the column 'REGISTER_DATETIME'. (basically NotNull if selected: for the constraint)
      */
-    public java.sql.Timestamp getRegisterDatetime() {
+    public java.time.LocalDateTime getRegisterDatetime() {
         checkSpecifiedProperty("registerDatetime");
         return _registerDatetime;
     }
 
     /**
-     * [set] REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br />
+     * [set] REGISTER_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br>
      * @param registerDatetime The value of the column 'REGISTER_DATETIME'. (basically NotNull if update: for the constraint)
      */
-    public void setRegisterDatetime(java.sql.Timestamp registerDatetime) {
+    public void setRegisterDatetime(java.time.LocalDateTime registerDatetime) {
         registerModifiedProperty("registerDatetime");
         _registerDatetime = registerDatetime;
     }
 
     /**
-     * [get] REGISTER_USER: {NotNull, VARCHAR(200)} <br />
+     * [get] REGISTER_USER: {NotNull, VARCHAR(200)} <br>
      * @return The value of the column 'REGISTER_USER'. (basically NotNull if selected: for the constraint)
      */
     public String getRegisterUser() {
@@ -318,7 +269,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [set] REGISTER_USER: {NotNull, VARCHAR(200)} <br />
+     * [set] REGISTER_USER: {NotNull, VARCHAR(200)} <br>
      * @param registerUser The value of the column 'REGISTER_USER'. (basically NotNull if update: for the constraint)
      */
     public void setRegisterUser(String registerUser) {
@@ -327,25 +278,25 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [get] UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br />
+     * [get] UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br>
      * @return The value of the column 'UPDATE_DATETIME'. (basically NotNull if selected: for the constraint)
      */
-    public java.sql.Timestamp getUpdateDatetime() {
+    public java.time.LocalDateTime getUpdateDatetime() {
         checkSpecifiedProperty("updateDatetime");
         return _updateDatetime;
     }
 
     /**
-     * [set] UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br />
+     * [set] UPDATE_DATETIME: {NotNull, TIMESTAMP(23, 10)} <br>
      * @param updateDatetime The value of the column 'UPDATE_DATETIME'. (basically NotNull if update: for the constraint)
      */
-    public void setUpdateDatetime(java.sql.Timestamp updateDatetime) {
+    public void setUpdateDatetime(java.time.LocalDateTime updateDatetime) {
         registerModifiedProperty("updateDatetime");
         _updateDatetime = updateDatetime;
     }
 
     /**
-     * [get] UPDATE_USER: {NotNull, VARCHAR(200)} <br />
+     * [get] UPDATE_USER: {NotNull, VARCHAR(200)} <br>
      * @return The value of the column 'UPDATE_USER'. (basically NotNull if selected: for the constraint)
      */
     public String getUpdateUser() {
@@ -354,7 +305,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [set] UPDATE_USER: {NotNull, VARCHAR(200)} <br />
+     * [set] UPDATE_USER: {NotNull, VARCHAR(200)} <br>
      * @param updateUser The value of the column 'UPDATE_USER'. (basically NotNull if update: for the constraint)
      */
     public void setUpdateUser(String updateUser) {
@@ -363,7 +314,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [get] VERSION_NO: {NotNull, BIGINT(19)} <br />
+     * [get] VERSION_NO: {NotNull, BIGINT(19)} <br>
      * @return The value of the column 'VERSION_NO'. (basically NotNull if selected: for the constraint)
      */
     public Long getVersionNo() {
@@ -372,7 +323,7 @@ public abstract class BsWidget extends AbstractEntity implements DomainEntity, E
     }
 
     /**
-     * [set] VERSION_NO: {NotNull, BIGINT(19)} <br />
+     * [set] VERSION_NO: {NotNull, BIGINT(19)} <br>
      * @param versionNo The value of the column 'VERSION_NO'. (basically NotNull if update: for the constraint)
      */
     public void setVersionNo(Long versionNo) {

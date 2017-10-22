@@ -1,10 +1,10 @@
 package dbflute.allcommon;
 
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
-import org.seasar.dbflute.cbean.sqlclause.*;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.sqlclause.*;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.dbway.DBDef;
 
 /**
  * The creator of SQL clause.
@@ -21,7 +21,7 @@ public class ImplementedSqlClauseCreator implements SqlClauseCreator {
 	 * @return SQL clause. (NotNull)
 	 */
     public SqlClause createSqlClause(ConditionBean cb) {
-        String tableDbName = cb.getTableDbName();
+        String tableDbName = cb.asTableDbName();
 		SqlClause sqlClause = createSqlClause(tableDbName);
         return sqlClause;
     }
@@ -139,25 +139,76 @@ public class ImplementedSqlClauseCreator implements SqlClauseCreator {
     //                                                                              Option
     //                                                                              ======
     protected void setupSqlClauseOption(SqlClause sqlClause) {
+        doSetupSqlClauseInnerJoinAutoDetect(sqlClause);
+        doSetupSqlClauseThatsBadTimingDetect(sqlClause);
+        doSetupSqlClauseNullOrEmptyQuery(sqlClause);
+        doSetupSqlClauseEmptyStringQuery(sqlClause);
+        doSetupSqlClauseOverridingQuery(sqlClause);
+        doSetupSqlClauseColumnNullObject(sqlClause);
+        doSetupSqlClauseColumnNullObjectGearedToSpecify(sqlClause);
+        doSetupSqlClauseTruncateConditionDatetimePrecision(sqlClause);
+        doSetupSqlClauseSelectIndex(sqlClause);
+    }
+
+    protected void doSetupSqlClauseInnerJoinAutoDetect(SqlClause sqlClause) {
         if (isInnerJoinAutoDetect()) {
             sqlClause.enableInnerJoinAutoDetect();
         }
+    }
+
+    protected void doSetupSqlClauseThatsBadTimingDetect(SqlClause sqlClause) {
         if (isThatsBadTimingDetect()) {
             sqlClause.enableThatsBadTimingDetect();
         }
+    }
+
+    protected void doSetupSqlClauseNullOrEmptyQuery(SqlClause sqlClause) {
         if (isNullOrEmptyQueryAllowed()) { // default for 1.0.5
             sqlClause.ignoreNullOrEmptyQuery();
         } else { // default for 1.1
             sqlClause.checkNullOrEmptyQuery();
         }
+    }
+
+    protected void doSetupSqlClauseEmptyStringQuery(SqlClause sqlClause) {
         if (isEmptyStringQueryAllowed()) {
             sqlClause.enableEmptyStringQuery();
         }
+    }
+
+    protected void doSetupSqlClauseOverridingQuery(SqlClause sqlClause) {
         if (isOverridingQueryAllowed()) { // default for 1.0.5
             sqlClause.enableOverridingQuery();
         } else { // default for 1.1
             sqlClause.disableOverridingQuery();
         }
+    }
+
+    protected void doSetupSqlClauseColumnNullObject(SqlClause sqlClause) {
+        if (isColumnNullObjectAllowed()) {
+            sqlClause.enableColumnNullObject();
+        } else {
+            sqlClause.disableColumnNullObject();
+        }
+    }
+
+    protected void doSetupSqlClauseColumnNullObjectGearedToSpecify(SqlClause sqlClause) {
+        if (isColumnNullObjectGearedToSpecify()) {
+            sqlClause.enableColumnNullObjectGearedToSpecify();
+        } else {
+            sqlClause.disableColumnNullObjectGearedToSpecify();
+        }
+    }
+
+    protected void doSetupSqlClauseTruncateConditionDatetimePrecision(SqlClause sqlClause) {
+        if (isDatetimePrecisionTruncationOfCondition()) {
+            sqlClause.enableDatetimePrecisionTruncationOfCondition();
+        } else {
+            sqlClause.disableDatetimePrecisionTruncationOfCondition();
+        }
+    }
+
+    protected void doSetupSqlClauseSelectIndex(SqlClause sqlClause) {
         if (isDisableSelectIndex()) {
             sqlClause.disableSelectIndex();
         }
@@ -188,6 +239,18 @@ public class ImplementedSqlClauseCreator implements SqlClauseCreator {
 
     protected boolean isOverridingQueryAllowed() {
 	    return DBFluteConfig.getInstance().isOverridingQueryAllowed();
+    }
+
+    protected boolean isColumnNullObjectAllowed() {
+	    return DBFluteConfig.getInstance().isColumnNullObjectAllowed();
+    }
+
+    protected boolean isColumnNullObjectGearedToSpecify() {
+	    return DBFluteConfig.getInstance().isColumnNullObjectGearedToSpecify();
+    }
+
+    protected boolean isDatetimePrecisionTruncationOfCondition() {
+	    return DBFluteConfig.getInstance().isDatetimePrecisionTruncationOfCondition();
     }
 
     protected boolean isDisableSelectIndex() {

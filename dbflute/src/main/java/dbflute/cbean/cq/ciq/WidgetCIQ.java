@@ -1,12 +1,12 @@
 package dbflute.cbean.cq.ciq;
 
 import java.util.Map;
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.ckey.*;
-import org.seasar.dbflute.cbean.coption.ConditionOption;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.dbflute.cbean.*;
+import org.dbflute.cbean.ckey.*;
+import org.dbflute.cbean.coption.ConditionOption;
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import dbflute.cbean.*;
 import dbflute.cbean.cq.bs.*;
 import dbflute.cbean.cq.*;
@@ -61,14 +61,14 @@ public class WidgetCIQ extends AbstractBsWidgetCQ {
     // ===================================================================================
     //                                                                Override about Query
     //                                                                ====================
-    protected ConditionValue getCValueId() { return _myCQ.getId(); }
-    protected ConditionValue getCValueName() { return _myCQ.getName(); }
-    protected ConditionValue getCValuePrice() { return _myCQ.getPrice(); }
-    protected ConditionValue getCValueRegisterDatetime() { return _myCQ.getRegisterDatetime(); }
-    protected ConditionValue getCValueRegisterUser() { return _myCQ.getRegisterUser(); }
-    protected ConditionValue getCValueUpdateDatetime() { return _myCQ.getUpdateDatetime(); }
-    protected ConditionValue getCValueUpdateUser() { return _myCQ.getUpdateUser(); }
-    protected ConditionValue getCValueVersionNo() { return _myCQ.getVersionNo(); }
+    protected ConditionValue xgetCValueId() { return _myCQ.xdfgetId(); }
+    protected ConditionValue xgetCValueName() { return _myCQ.xdfgetName(); }
+    protected ConditionValue xgetCValuePrice() { return _myCQ.xdfgetPrice(); }
+    protected ConditionValue xgetCValueRegisterDatetime() { return _myCQ.xdfgetRegisterDatetime(); }
+    protected ConditionValue xgetCValueRegisterUser() { return _myCQ.xdfgetRegisterUser(); }
+    protected ConditionValue xgetCValueUpdateDatetime() { return _myCQ.xdfgetUpdateDatetime(); }
+    protected ConditionValue xgetCValueUpdateUser() { return _myCQ.xdfgetUpdateUser(); }
+    protected ConditionValue xgetCValueVersionNo() { return _myCQ.xdfgetVersionNo(); }
     protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String pp) { return null; }
     public String keepScalarCondition(WidgetCQ sq)
     { throwIICBOE("ScalarCondition"); return null; }
@@ -80,8 +80,6 @@ public class WidgetCIQ extends AbstractBsWidgetCQ {
     { throwIICBOE("(Query)MyselfDerived"); return null;}
     public String keepMyselfExists(WidgetCQ sq)
     { throwIICBOE("MyselfExists"); return null;}
-    public String keepMyselfInScope(WidgetCQ sq)
-    { throwIICBOE("MyselfInScope"); return null;}
 
     protected void throwIICBOE(String name)
     { throw new IllegalConditionBeanOperationException(name + " at InlineView is unsupported."); }
