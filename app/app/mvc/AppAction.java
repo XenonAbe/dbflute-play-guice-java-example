@@ -2,26 +2,29 @@ package app.mvc;
 
 import app.core.Constants;
 import org.dbflute.hook.AccessContext;
+import play.Application;
 import play.Logger;
-import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletionStage;
 
 public class AppAction extends Action.Simple {
     private static final Logger.ALogger logger = Logger.of(AppAction.class);
 
+    protected final Application application;
     protected final Method actionMethod;
 
-    public AppAction(Method actionMethod) {
+    public AppAction(Application application, Method actionMethod) {
+        this.application = application;
         this.actionMethod = actionMethod;
     }
 
     @Override
-    public F.Promise<Result> call(Http.Context ctx) throws Throwable {
+    public CompletionStage<Result> call(Http.Context ctx) {
         try {
             try {
                 initializeContext(ctx);
