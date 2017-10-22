@@ -46,7 +46,7 @@ public class WidgetControllerTest extends WithApplication {
                 .bodyForm(ImmutableMap.of("name","widget 6", "price", "6"));
 
         Result result = route(request);
-        assertEquals(FORBIDDEN, result.status());    // Reject by CSRF Filter
+        assertEquals(SEE_OTHER, result.status());
     }
 
 }
