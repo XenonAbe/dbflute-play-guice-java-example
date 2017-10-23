@@ -21,25 +21,104 @@ public class AppAction extends Action.Simple {
     }
 
     @Override
-    public F.Promise<Result> call(Http.Context ctx) throws Throwable {
+    public F.Promise<Result> call(final Http.Context ctx) throws Throwable {
+        F.Promise<Result> resultPromise;
         try {
+            onBegin(ctx);
             try {
-                initializeContext(ctx);
-                return delegate.call(ctx);
-            } finally {
-                cleanupContext(ctx);
+                resultPromise = delegate.call(ctx);
+                if (logger.isInfoEnabled() && !resultPromise.wrapped().isCompleted())
+                    logger.info("ASYNC ctx:{}", ctx.id());
+            } catch(Throwable t) {
+                resultPromise = F.Promise.pure(handleException(ctx, t));
             }
-        } catch(RuntimeException e) {
-            throw e;
         } catch(Throwable t) {
-            throw new RuntimeException(t);
+            onComplete(ctx, null, t);
+            throw t;
         }
+
+        resultPromise = resultPromise.recover(new F.Function<Throwable, Result>() {
+            @Override
+            public Result apply(Throwable throwable) throws Throwable {
+                final Http.Context oldCtx = Http.Context.current.get();
+                if (oldCtx == null) Http.Context.current.set(ctx);
+                try {
+                    return handleException(Http.Context.current(), throwable);
+                } finally {
+                    Http.Context.current.set(oldCtx);
+                }
+            }
+        });
+
+        resultPromise.onFailure(new F.Callback<Throwable>() {
+            @Override
+            public void invoke(Throwable throwable) throws Throwable {
+                final Http.Context oldCtx = Http.Context.current.get();
+                if (oldCtx == null) Http.Context.current.set(ctx);
+                try {
+                    onComplete(Http.Context.current(), null, throwable);
+                } finally {
+                    Http.Context.current.set(oldCtx);
+                }
+            }
+        });
+
+        resultPromise.onRedeem(new F.Callback<Result>() {
+            @Override
+            public void invoke(Result result) throws Throwable {
+                final Http.Context oldCtx = Http.Context.current.get();
+                if (oldCtx == null) Http.Context.current.set(ctx);
+                try {
+                    onComplete(Http.Context.current(), result, null);
+                } finally {
+                    Http.Context.current.set(oldCtx);
+                }
+            }
+        });
+
+        return resultPromise;
     }
 
-    protected void initializeContext(Http.Context ctx) {
+    protected Result handleException(Http.Context ctx, Throwable throwable) {
+        if (logger.isWarnEnabled())
+            logger.warn("Exception Occurred ctx:{} {}: {}", ctx.id(), throwable.getClass().getSimpleName(), throwable.getMessage());
+
+        if (throwable instanceof RuntimeException)
+            throw (RuntimeException)throwable;
+        else if (throwable instanceof Error)
+            throw (Error)throwable;
+        throw new RuntimeException(throwable);
+    }
+
+    protected void onBegin(Http.Context ctx) {
         if (logger.isInfoEnabled())
             logger.info("BEGIN ctx:{} {} {}", ctx.id(), ctx.request().method(), ctx.request().uri());
 
+        initializeContext(ctx);
+    }
+
+    protected void onComplete(Http.Context ctx, Result result, Throwable throwable) {
+        try {
+            if (throwable != null)
+                onFailure(Http.Context.current(), throwable);
+            else
+                onDone(Http.Context.current(), result);
+        } finally {
+            cleanupContext(ctx);
+        }
+    }
+
+    protected void onDone(Http.Context ctx, Result result) {
+        if (logger.isInfoEnabled())
+            logger.info("DONE  ctx:{} {}", ctx.id(), result.status());
+    }
+
+    protected void onFailure(Http.Context ctx, Throwable throwable) {
+        if (logger.isErrorEnabled())
+            logger.error("FAIL  ctx:{}", ctx.id(), throwable);
+    }
+
+    protected void initializeContext(Http.Context ctx) {
         // DBFlute AccessContextの設定
         AccessContext.setAccessContextOnThread(createAccessContext());
     }
@@ -48,9 +127,6 @@ public class AppAction extends Action.Simple {
         for (String key : Constants.CtxArgsKeys) {
             ctx.args.remove(key);
         }
-
-        if (logger.isInfoEnabled())
-            logger.info("END   ctx:{}", ctx.id());
     }
 
     protected AccessContext createAccessContext() {
