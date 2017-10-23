@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletionStage;
 
+import static play.mvc.Security.USERNAME;
+
 public class AppAction extends Action.Simple {
     private static final Logger.ALogger logger = Logger.of(AppAction.class);
 
@@ -66,7 +68,7 @@ public class AppAction extends Action.Simple {
     }
 
     protected String getAccessUser(Http.Context ctx) {
-        final String user = ctx == null ? "" : ctx.request().username();    // ユーザー認証されていない場合はnullとなる
+        final String user = ctx == null ? "" : ctx.request().attrs().getOptional(USERNAME).orElse(null);    // ユーザー認証されていない場合はnullとなる
         return user == null ? "unknown" : user;
     }
 
