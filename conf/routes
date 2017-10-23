@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index()
 
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
+GET     /insert                     controllers.AsyncController.insert
 
 # Widgets
 GET     /widgets                    controllers.WidgetController.listWidgets

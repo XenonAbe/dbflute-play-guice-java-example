@@ -4,7 +4,11 @@ import akka.actor.ActorSystem;
 import javax.inject.*;
 
 import akka.actor.Scheduler;
-import play.*;
+import app.libs.concurrent.DatabaseExecutionContext;
+import dbflute.exbhv.WidgetBhv;
+import dbflute.exentity.Widget;
+import org.springframework.transaction.annotation.Transactional;
+import play.Logger;
 import play.mvc.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.CompletableFuture;
@@ -22,9 +26,13 @@ import scala.concurrent.ExecutionContextExecutor;
  */
 @Singleton
 public class AsyncController extends Controller {
+    private static final Logger.ALogger logger = Logger.of(AsyncController.class);
 
     private final ActorSystem actorSystem;
     private final ExecutionContextExecutor exec;
+
+    private final DatabaseExecutionContext dbExecutionContext;
+    private final WidgetBhv widgetBhv;
 
     /**
      * @param actorSystem We need the {@link ActorSystem}'s
@@ -33,11 +41,15 @@ public class AsyncController extends Controller {
      * of the {@link CompletableFuture} and a Scala
      * {@link ExecutionContext} so we can use the Akka {@link Scheduler}.
      * An {@link ExecutionContextExecutor} implements both interfaces.
+     * @param dbExecutionContext
+     * @param widgetBhv
      */
     @Inject
-    public AsyncController(ActorSystem actorSystem, ExecutionContextExecutor exec) {
+    public AsyncController(ActorSystem actorSystem, ExecutionContextExecutor exec, DatabaseExecutionContext dbExecutionContext, WidgetBhv widgetBhv) {
       this.actorSystem = actorSystem;
       this.exec = exec;
+      this.dbExecutionContext = dbExecutionContext;
+        this.widgetBhv = widgetBhv;
     }
 
     /**
@@ -60,6 +72,28 @@ public class AsyncController extends Controller {
             exec
         );
         return future;
+    }
+
+    /**
+     * 非同期にデータベースアクセスするサンプル
+     * データベース処理用のカスタムExecutionContextを使用
+     * @see <a href="https://www.playframework.com/documentation/2.6.x/Highlights26#updated-templates-with-preconfigured-customexecutioncontexts">CustomExecutionContext</a>
+     */
+    public CompletionStage<Result> insert() {
+        return CompletableFuture.supplyAsync(() -> {
+
+            insertInternal();
+
+            return ok();
+        }, dbExecutionContext.withHttpContext());
+    }
+
+    @Transactional
+    protected void insertInternal() {
+        Widget entity = new Widget();
+        entity.setName("Async");
+        entity.setPrice(68000);
+        widgetBhv.insert(entity);
     }
 
 }
