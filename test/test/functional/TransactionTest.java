@@ -30,10 +30,7 @@ public class TransactionTest {
 
     @BeforeClass
     public static void start() {
-        GuiceApplicationBuilder builder = new GuiceApplicationBuilder()
-                .in(Mode.TEST);
-        final Injector injector = Guice.createInjector(builder.applicationModule());
-        app = injector.getInstance(Application.class);
+        app = Helpers.fakeApplication();
 
         Helpers.start(app);
         transactionTestService = TestUtils.instanceOf(app, TransactionTestService.class);
