@@ -24,7 +24,7 @@ public class WidgetControllerTest extends WithApplication {
                 .method(GET)
                 .uri("/");
 
-        Result result = route(request);
+        Result result = route(app, request);
         assertEquals(OK, result.status());
     }
 
@@ -34,7 +34,7 @@ public class WidgetControllerTest extends WithApplication {
                 .method(GET)
                 .uri("/widgets");
 
-        Result result = route(request);
+        Result result = route(app, request);
         assertEquals(OK, result.status());
     }
 
@@ -45,7 +45,7 @@ public class WidgetControllerTest extends WithApplication {
                 .uri("/widgets")
                 .bodyForm(ImmutableMap.of("name","widget 6", "price", "6"));
 
-        Result result = route(request);
+        Result result = route(app, request);
         assertEquals(SEE_OTHER, result.status());
     }
 
