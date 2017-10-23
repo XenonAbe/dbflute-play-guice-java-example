@@ -11,7 +11,7 @@
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <charset>MS932</charset>
+      <!-- <charset>MS932</charset> -->
       <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
     </encoder>
   </appender>
@@ -21,8 +21,8 @@
 
   <logger name="app" level="DEBUG" />
 
-  <!-- <logger name="com.jolbox.bonecp" level="TRACE" /> -->
-  <logger name="org.springframework.jdbc.datasource" level="INFO" />DEBUG
+  <logger name="com.jolbox.bonecp" level="OFF" />
+  <logger name="org.springframework.jdbc.datasource" level="INFO" />
   <logger name="org.seasar.dbflute" level="INFO" />
   <logger name="org.seasar.dbflute.QLog" level="DEBUG" />
 
