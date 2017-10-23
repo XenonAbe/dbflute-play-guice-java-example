@@ -3,8 +3,9 @@ import sbt._
 object Dependencies {
 
   // see framework/project/Dependencies.scala in Play Framework Source
-  val springframeworkVersion = "4.2.7.RELEASE"
-  val guiceVersion = "4.0"
+  val springframeworkVersion = "4.3.10.RELEASE"
+  val guiceVersion = "4.1.0"
+  val h2databaseVersion = "1.4.196"
 
   val guice = "com.google.inject" % "guice" % Dependencies.guiceVersion
 

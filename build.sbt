@@ -2,7 +2,7 @@ name := """dbflute-play-guice-java-example"""
 
 def commonSettings = Seq(
   version := "2.6.1-SNAPSHOT",
-  scalaVersion := "2.11.7",     // cf. templates/build.sbt in Play Framework Source
+  scalaVersion := "2.12.2",     // cf. play-java-starter-example
   javacOptions ++= Seq("-encoding", "utf8")
 )
 
@@ -13,10 +13,9 @@ lazy val root = Project("Example-Main", file("."))
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(
+      guice,
       javaJdbc,
-      cache,
-      javaWs,
-      filters,
+      "com.h2database" % "h2" % Dependencies.h2databaseVersion,
       "org.springframework" % "spring-jdbc" % Dependencies.springframeworkVersion,
       "org.springframework" % "spring-aop" % Dependencies.springframeworkVersion
     )
@@ -38,3 +37,10 @@ javaOptions in Test ++= Seq(
   "-Dconfig.resource=application-test.conf",
   "-Dlogger.resource=logback-test.xml"
 )
+
+// Testing libraries for dealing with CompletionStage...
+libraryDependencies += "org.assertj" % "assertj-core" % "3.6.2" % Test
+libraryDependencies += "org.awaitility" % "awaitility" % "2.0.0" % Test
+
+// Make verbose tests
+testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "-a", "-v"))
