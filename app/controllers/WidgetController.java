@@ -41,7 +41,7 @@ public class WidgetController extends Controller {
         final Form<WidgetItem> form = formFactory.form(WidgetItem.class).bindFromRequest();
 
         if (form.hasErrors()) {
-            logger.error("errors = {}", form.errors());
+            logger.error("errors = {}", form.allErrors());
             return badRequest(views.html.listWidgets.render(toSeq(selectWidgetList()), form));
         }
 
