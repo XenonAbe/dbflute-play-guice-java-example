@@ -28,17 +28,20 @@ And open http://localhost:9000/
 sbt test
 ```
 
-`test.functional.TransactionTestService`クラスに多様なトランザクション処理の記述があります
+`test.functional.TransactionTestService`クラスに多様なトランザクション処理の記述例があります
 
 ## その他
 
-* DBFlute関係(DBFluteクライアント、エンジン、生成ソース)をサブプロジェクトとして本体と分離しています (dbfluteディレクトリ)
+#### サブプロジェクト
+DBFlute関係(DBFluteクライアント、エンジン、生成ソース)をサブプロジェクトとしてメインプロジェクトと分離しています (dbfluteディレクトリ)
 
-## ウォークスルー
+#### ログ出力
+Play Framework デフォルトのログ出力は非常にシンプルですが、このサンプルではActionやTransactionの開始・終了、実行SQLがログで確認出来るよう設定しています
 
-Global.java でGuice、DBFlute、Springの初期設定をしています。  
+#### 非同期処理
+データベース処理用のカスタムExecutionContextを使用した非同期処理のサンプルがあります
 
-以下参考リンク
+#### 参考リンク
 * DBFlute - Guice連携に関して -- [Google Guiceの取扱い](http://dbflute.seasar.org/ja/manual/reference/diway/guice/)
 * PlayFramework使用時のDBFluteのAccessContext設定 - [複数スレッドに渡るTransactionへの対応](https://github.com/seasarorg/dbflute-play/issues/6#issuecomment-42439800)
 * Springのトランザクション管理 - [(その14)トランザクション管理 - あるまに](http://d.hatena.ne.jp/arumani/20070327/1175006088)
