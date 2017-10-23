@@ -33,16 +33,14 @@ public class AppAction extends Action.Simple {
             onBegin(ctx);
             try {
                 resultCompletionStage = delegate.call(ctx);
-                if (resultCompletionStage instanceof CompletableFuture && !((CompletableFuture)resultCompletionStage).isDone())
+                if (logger.isInfoEnabled() && resultCompletionStage instanceof CompletableFuture && !((CompletableFuture)resultCompletionStage).isDone())
                     logger.info("ASYNC ctx:{}", ctx.id());
             } catch(Throwable t) {
                 resultCompletionStage = CompletableFuture.completedFuture(handleException(ctx, t));
             }
         } catch(Throwable t) {
             onComplete(ctx, null, t);
-            if (t instanceof RuntimeException || t instanceof Error)
-                throw t;
-            throw new RuntimeException(t);
+            throw t;
         }
 
         resultCompletionStage = resultCompletionStage.exceptionally(throwable -> {
@@ -69,7 +67,8 @@ public class AppAction extends Action.Simple {
     }
 
     protected Result handleException(Http.Context ctx, Throwable throwable) {
-        logger.debug("Exception Occurred ctx:{} {}", ctx.id(),  throwable.getClass().getSimpleName());
+        if (logger.isWarnEnabled())
+            logger.warn("Exception Occurred ctx:{} {}: {}", ctx.id(), throwable.getClass().getSimpleName(), throwable.getMessage());
 
         if (throwable instanceof RuntimeException)
             throw (RuntimeException)throwable;
@@ -88,22 +87,22 @@ public class AppAction extends Action.Simple {
     protected void onComplete(Http.Context ctx, Result result, Throwable throwable) {
         try {
             if (throwable != null)
-                onException(Http.Context.current(), throwable);
+                onFailure(Http.Context.current(), throwable);
             else
-                onResult(Http.Context.current(), result);
+                onDone(Http.Context.current(), result);
         } finally {
             cleanupContext(ctx);
         }
     }
 
-    protected void onResult(Http.Context ctx, Result result) {
+    protected void onDone(Http.Context ctx, Result result) {
         if (logger.isInfoEnabled())
-            logger.info("END   ctx:{} {}", ctx.id(), result.status());
+            logger.info("DONE  ctx:{} {}", ctx.id(), result.status());
     }
 
-    protected void onException(Http.Context ctx, Throwable throwable) {
-        if (logger.isInfoEnabled())
-            logger.info("ERROR ctx:{}", ctx.id(), throwable);
+    protected void onFailure(Http.Context ctx, Throwable throwable) {
+        if (logger.isErrorEnabled())
+            logger.error("FAIL  ctx:{}", ctx.id(), throwable);
     }
 
     protected void initializeContext(Http.Context ctx) {
