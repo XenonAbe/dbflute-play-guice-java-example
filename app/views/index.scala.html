@@ -1,12 +1,12 @@
 @(message: String)
 
 @main("Welcome to Play") {
-    <div style="margin: 40px 80px">
+    <div id="headerlink">
         <ul>
             <li>Please go to <a href="@routes.WidgetController.listWidgets">@routes.WidgetController.listWidgets</a></li>
         </ul>
     </div>
 
-    @play20.welcome(message, style = "Java")
+    @welcome(message, style = "Java")
 
 }
