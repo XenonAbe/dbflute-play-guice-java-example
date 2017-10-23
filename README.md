@@ -1,11 +1,11 @@
 # DBFlute Play Framework 2 Example
-[DBFlute](http://dbflute.seasar.org/)を[Play Framework](https://www.playframework.com/) 2.5.x 上で 使用するサンプルです。
+[DBFlute](http://dbflute.seasar.org/)を[Play Framework](https://www.playframework.com/) 2.6.x 上で 使用するサンプルです。
 
 ## Overview
 
 * O/Rマッパーに[DBFlute](http://dbflute.seasar.org/ja/introduction/index.html)を使用
 * Web Frameworkに[Play Framework](https://www.playframework.com/)を使用
-* [Spring Framework](https://projects.spring.io/spring-framework/)の[Transaction Management](https://docs.spring.io/spring/docs/4.2.7.RELEASE/spring-framework-reference/html/transaction.html)を使用。メソッドへの@Transactionalアノテーション(see [Reference](https://docs.spring.io/spring/docs/4.2.7.RELEASE/spring-framework-reference/html/transaction.html#transaction-declarative-annotations))の付加や、TransactionTemplate(see [Reference](https://docs.spring.io/spring/docs/4.2.7.RELEASE/spring-framework-reference/html/transaction.html#tx-prog-template))を使用したトランザクション制御を行うことができる。混在も可能。基本的な、通常実行時にはCommit、例外発生時にRollbackする動作の他、柔軟なトランザクション制御(e.g. [Transaction propagation](https://docs.spring.io/spring/docs/4.2.7.RELEASE/spring-framework-reference/htmlsingle/#tx-propagation))が可能
+* [Spring Framework](https://projects.spring.io/spring-framework/)の[Transaction Management](https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/html/transaction.html)を使用。メソッドへの@Transactionalアノテーション(see [Reference](https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/html/transaction.html#transaction-declarative-annotations))の付加や、TransactionTemplate(see [Reference](https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/html/transaction.html#tx-prog-template))を使用したトランザクション制御を行うことができる。混在も可能。基本的な、通常実行時にはCommit、例外発生時にRollbackする動作の他、柔軟なトランザクション制御(e.g. [Transaction propagation](https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#tx-propagation))が可能
 * コネクションプールにPlay Framework組み込みの[HikariCP](http://brettwooldridge.github.io/HikariCP/)を使用
 * Dependency InjectionライブラリにPlay Framework組み込みのGoogle Guiceを使用
 
@@ -40,4 +40,4 @@ sbt test
 * Springのトランザクション管理 - [(その14)トランザクション管理 - あるまに](http://d.hatena.ne.jp/arumani/20070327/1175006088)
 
 ## 謝辞
-サンプルの動作は [play-java-forms-example](https://github.com/playframework/play-java-forms-example) を参考にさせていただきました。
+サンプルの動作は [play-java-forms-example](https://github.com/playframework/play-java-forms-example) および [play-java-starter-example](https://github.com/playframework/play-java-starter-example) を参考にさせていただきました。
